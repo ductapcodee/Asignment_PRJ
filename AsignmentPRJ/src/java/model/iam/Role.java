@@ -12,16 +12,25 @@ import model.BaseModel;
  * @author sonnt
  */
 public class Role extends BaseModel {
-    private String name;
+    private String rname;
+    private int rid;
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Feature> features = new ArrayList<>();
 
-    public String getName() {
-        return name;
+    public String getRname() {
+        return rname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRname(String rname) {
+        this.rname = rname;
+    }
+
+    public int getRid() {
+        return rid;
+    }
+
+    public void setRid(int rid) {
+        this.rid = rid;
     }
 
     public ArrayList<User> getUsers() {
@@ -39,5 +48,6 @@ public class Role extends BaseModel {
     public void setFeatures(ArrayList<Feature> features) {
         this.features = features;
     }
-    
+
+
 }
