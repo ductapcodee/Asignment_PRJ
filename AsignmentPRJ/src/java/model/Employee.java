@@ -10,8 +10,8 @@ package model;
  */
 public class Employee extends BaseModel {
     private String name;
-    private Department dept; 
-    private Employee supervisor;
+    private Division division; // Mối quan hệ 1-nhiều: 1 Division có nhiều Employee
+    private Employee supervisor; // Trưởng bộ phận (nếu có)
 
     public String getName() {
         return name;
@@ -21,12 +21,12 @@ public class Employee extends BaseModel {
         this.name = name;
     }
 
-    public Department getDept() {
-        return dept;
+    public Division getDivision() {
+        return division;
     }
 
-    public void setDept(Department dept) {
-        this.dept = dept;
+    public void setDivision(Division division) {
+        this.division = division;
     }
 
     public Employee getSupervisor() {
@@ -36,5 +36,4 @@ public class Employee extends BaseModel {
     public void setSupervisor(Employee supervisor) {
         this.supervisor = supervisor;
     }
-    
 }
