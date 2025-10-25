@@ -19,6 +19,15 @@ public class RequestForLeave extends BaseModel {
     private Date toDate;   // đổi tên
     private String reason;
     private int status; // 1 = In progress, 2 = Approved, 3 = Rejected
+    private String employeeName;
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
 
     public int getCreatedBy() { return createdBy; }
     public void setCreatedBy(int createdBy) { this.createdBy = createdBy; }
