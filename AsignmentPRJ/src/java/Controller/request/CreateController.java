@@ -30,9 +30,9 @@ public class CreateController extends BaseRequiredAuthenticationController {
             String reason = req.getParameter("reason");
 
             RequestForLeave request = new RequestForLeave();
-            request.setCreatedBy(user.getEmployee().getId());
-            request.setFromDate(Date.valueOf(from));
-            request.setToDate(Date.valueOf(to));
+            request.setCreatedBy(user.getEmployee());
+            request.setFrom(Date.valueOf(from));
+            request.setTo(Date.valueOf(to));
             request.setReason(reason);
             request.setStatus(1); // 1 = In progress
 

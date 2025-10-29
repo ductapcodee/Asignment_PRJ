@@ -7,13 +7,16 @@ package Controller.request;
 
 
 import Controller.iam.BaseRequiredAuthenticationController;
+import dal.EmployeeDBContext;
 import dal.RequestDBContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import model.Employee;
 import model.RequestForLeave;
 import model.iam.User;
 
@@ -28,31 +31,38 @@ public class ListController extends BaseRequiredAuthenticationController {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp, User user)
             throws ServletException, IOException {
 
-        RequestDBContext db = new RequestDBContext();
-        ArrayList<RequestForLeave> list;
+        RequestDBContext requestDB = new RequestDBContext();
+        EmployeeDBContext empDB = new EmployeeDBContext();
 
-        // Lấy role đầu tiên (đơn giản hoá)
-        String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().get(0).getRname();
+        int empId = user.getEmployee().getId();
+        Employee current = empDB.get(empId);
+        String role = user.getPrimaryRoleName();
 
-        if (roleName.contains("Head")) {
-            // Sếp lớn → xem toàn bộ
-            list = db.getAllRequests();
-        } else if (roleName.contains("PM")) {
-            // Quản lý → xem cấp dưới + đơn của chính mình
-            list = db.getSubordinateRequests(user.getEmployee().getId());
-            list.addAll(db.getOwnRequests(user.getEmployee().getId()));
-        } else {
-            // Nhân viên bình thường → chỉ xem của mình
-            list = db.getOwnRequests(user.getEmployee().getId());
+        ArrayList<RequestForLeave> list = new ArrayList<>();
+
+        System.out.println(">>> Role: " + role + ", EmpID: " + empId);
+
+        if (role.contains("Employee")) {
+            list = requestDB.getRequestsOfEmployee(empId);
+        } else if (role.contains("PM")) {
+            list = requestDB.getRequestsOfManager(empId);
+        } else if (role.contains("Head") || current.getSupervisor() == null) {
+            if (current.getDivision() != null)
+                list = requestDB.getRequestsOfDivision(current.getDivision().getId());
         }
 
+        System.out.println(">>> Found requests: " + list.size());
+
         req.setAttribute("requests", list);
-        req.getRequestDispatcher("../view/request/list.jsp").forward(req, resp);
+        req.setAttribute("currentUser", current);
+        req.setAttribute("roleName", role);
+        req.setAttribute("nowPlus1", LocalDate.now().plusDays(1));
+        req.getRequestDispatcher("/view/request/list.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp, User user)
             throws ServletException, IOException {
-        // xử lý duyệt/từ chối ở đây (manager)
+        resp.sendRedirect("list");
     }
 }

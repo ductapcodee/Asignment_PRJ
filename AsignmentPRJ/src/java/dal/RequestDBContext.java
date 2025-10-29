@@ -6,91 +6,29 @@ package dal;
 
 import java.sql.*;
 import java.util.ArrayList;
+import model.Employee;
 import model.RequestForLeave;
 
 public class RequestDBContext extends DBContext<RequestForLeave> {
 
-    @Override
-    public void insert(RequestForLeave model) {
-        String sql = """
-            INSERT INTO RequestForLeave(created_by, created_time, [from], [to], reason, status)
-            VALUES (?, GETDATE(), ?, ?, ?, ?)
-        """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, model.getCreatedBy());
-            stm.setDate(2, model.getFromDate());
-            stm.setDate(3, model.getToDate());
-            stm.setString(4, model.getReason());
-            stm.setInt(5, model.getStatus());
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
-    }
+    private final EmployeeDBContext empDB = new EmployeeDBContext();
 
-    /**
-     * ✅ 1. Lấy danh sách đơn của chính user đang đăng nhập *
-     */
-    public ArrayList<RequestForLeave> getOwnRequests(int empId) {
+    // ✅ Lấy tất cả request của một nhân viên
+    public ArrayList<RequestForLeave> getRequestsOfEmployee(int empId) {
         ArrayList<RequestForLeave> list = new ArrayList<>();
         String sql = """
-        SELECT r.rid, r.created_time, r.[from], r.[to], r.reason, r.status, r.created_by, e.ename
-        FROM RequestForLeave r
-        JOIN Employee e ON r.created_by = e.eid
-        WHERE r.created_by = ?
-        ORDER BY r.created_time DESC
-    """;
+            SELECT r.rid, r.created_by, r.created_time, r.[from], r.[to], r.reason, r.status,
+                   r.processed_by, r.process_reason, r.processed_time
+            FROM RequestForLeave r
+            WHERE r.created_by = ?
+            ORDER BY r.created_time DESC
+        """;
 
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, empId);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                RequestForLeave r = new RequestForLeave();
-                r.setId(rs.getInt("rid"));
-                r.setCreatedTime(rs.getDate("created_time"));
-                r.setFromDate(rs.getDate("from"));
-                r.setToDate(rs.getDate("to"));
-                r.setReason(rs.getString("reason"));
-                r.setStatus(rs.getInt("status"));
-                r.setCreatedBy(rs.getInt("created_by"));
-                r.setEmployeeName(rs.getString("ename")); // ✅ thêm dòng này
-                list.add(r);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // ❗ để in lỗi nếu SQL sai
-        }
-
-        return list;
-    }
-
-    /**
-     * ✅ 2. Lấy danh sách đơn của cấp dưới (dành cho Manager) *
-     */
-    public ArrayList<RequestForLeave> getSubordinateRequests(int supervisorId) {
-        ArrayList<RequestForLeave> list = new ArrayList<>();
-        String sql = """
-        SELECT r.rid, e.eid, e.ename, r.created_time, r.[from], r.[to], r.reason, r.status
-        FROM RequestForLeave r
-        INNER JOIN Employee e ON r.created_by = e.eid
-        WHERE e.supervisorid = ?
-        ORDER BY r.created_time DESC
-    """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, supervisorId);
-            ResultSet rs = stm.executeQuery();
-            while (rs.next()) {
-                RequestForLeave r = new RequestForLeave();
-                r.setId(rs.getInt("rid"));
-                r.setCreatedBy(rs.getInt("eid"));
-                r.setReason(rs.getString("reason"));
-                r.setEmployeeName(rs.getString("ename"));
-                r.setStatus(rs.getInt("status"));
-                r.setCreatedTime(rs.getDate("created_time"));
-                r.setFromDate(rs.getDate("from"));
-                r.setToDate(rs.getDate("to"));
-                list.add(r);
+                list.add(mapResult(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,29 +36,24 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
         return list;
     }
 
-    /**
-     * ✅ 3. Lấy toàn bộ đơn (cho Division Head / Admin) *
-     */
-    public ArrayList<RequestForLeave> getAllRequests() {
+    // ✅ Lấy tất cả request mà Manager có thể xem
+    public ArrayList<RequestForLeave> getRequestsOfManager(int managerId) {
         ArrayList<RequestForLeave> list = new ArrayList<>();
         String sql = """
-            SELECT r.rid, e.ename, r.created_time, r.[from], r.[to], r.reason, r.status
+            SELECT r.rid, r.created_by, r.created_time, r.[from], r.[to], r.reason, r.status,
+                   r.processed_by, r.process_reason, r.processed_time
             FROM RequestForLeave r
-            JOIN Employee e ON r.created_by = e.eid
+            WHERE r.created_by = ? OR r.created_by IN (
+                SELECT eid FROM Employee WHERE supervisorid = ?
+            )
             ORDER BY r.created_time DESC
         """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, managerId);
+            stm.setInt(2, managerId);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                RequestForLeave r = new RequestForLeave();
-                r.setId(rs.getInt("rid"));
-                r.setEmployeeName(rs.getString("ename"));
-                r.setCreatedTime(rs.getDate("created_time"));
-                r.setFromDate(rs.getDate("from"));
-                r.setToDate(rs.getDate("to"));
-                r.setReason(rs.getString("reason"));
-                r.setStatus(rs.getInt("status"));
-                list.add(r);
+                list.add(mapResult(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -128,31 +61,229 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
         return list;
     }
 
-    /**
-     * ✅ 4. Cập nhật trạng thái đơn (approve/reject) *
-     */
-    public void updateStatus(int requestId, int status, String reason) {
-        String sql = "UPDATE RequestForLeave SET status = ?, reason = ? WHERE rid = ?";
+    // ✅ Lấy tất cả request trong division (Division Leader)
+    public ArrayList<RequestForLeave> getRequestsOfDivision(int divisionId) {
+        ArrayList<RequestForLeave> list = new ArrayList<>();
+        String sql = """
+            SELECT r.rid, r.created_by, r.created_time, r.[from], r.[to], r.reason, r.status,
+                   r.processed_by, r.process_reason, r.processed_time
+            FROM RequestForLeave r
+            JOIN Employee e ON r.created_by = e.eid
+            WHERE e.did = ?
+            ORDER BY r.created_time DESC
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, divisionId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                list.add(mapResult(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // ✅ Duyệt đơn (Approve / Reject)
+    public void processRequest(int requestId, int status, String reason, int processedBy) {
+        String sql = """
+            UPDATE RequestForLeave
+            SET status = ?, 
+                process_reason = ?, 
+                processed_by = ?, 
+                processed_time = GETDATE()
+            WHERE rid = ?
+        """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, status);
             stm.setString(2, reason);
-            stm.setInt(3, requestId);
+            stm.setInt(3, processedBy);
+            stm.setInt(4, requestId);
             stm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
+            System.out.println("processRequest error: " + e.getMessage());
         }
     }
 
+    // ✅ Reprocess có kiểm tra quyền và ngày
+    public boolean reprocessRequest(int requestId, int newStatus, String reason, Employee processor) {
+        String sqlCheck = """
+            SELECT r.rid, r.status, r.processed_by, r.[from], e.eid as empId, e.supervisorid, e.did
+            FROM RequestForLeave r
+            JOIN Employee e ON e.eid = r.created_by
+            WHERE r.rid = ?
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sqlCheck)) {
+            stm.setInt(1, requestId);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                Date fromDate = rs.getDate("from");
+                int oldStatus = rs.getInt("status");
+                int prevProcessedBy = rs.getInt("processed_by");
+                int empDivision = rs.getInt("did");
+                int empId = rs.getInt("empId");
+                int supervisorId = rs.getInt("supervisorid");
+
+                // ❌ Nếu ngày nghỉ còn < 2 ngày thì không được reprocess
+                long diffDays = (fromDate.getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
+                if (diffDays < 2) {
+                    System.out.println(">>> Reprocess denied: too close to leave date");
+                    return false;
+                }
+
+                // ✅ Nếu là Division Leader → có thể reprocess đơn đã xử lý bởi PM
+                if (isDivisionLeader(processor)) {
+                    // Cho phép override mọi đơn đã được xử lý bởi Manager (PM)
+                    if (prevProcessedBy != 0 && isManager(prevProcessedBy)) {
+                        return updateReprocess(requestId, newStatus, reason, processor.getId());
+                    }
+                }
+
+                // ✅ Nếu là Manager và đơn của cấp dưới (supervisorid = mình)
+                if (isManager(processor.getId()) && supervisorId == processor.getId()) {
+                    return updateReprocess(requestId, newStatus, reason, processor.getId());
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean updateReprocess(int rid, int status, String reason, int processedBy) throws SQLException {
+        String sql = """
+            UPDATE RequestForLeave
+            SET status = ?, 
+                process_reason = ?, 
+                processed_by = ?, 
+                processed_time = GETDATE()
+            WHERE rid = ?
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, status);
+            stm.setString(2, reason);
+            stm.setInt(3, processedBy);
+            stm.setInt(4, rid);
+            return stm.executeUpdate() > 0;
+        }
+    }
+
+    private boolean isDivisionLeader(Employee e) throws SQLException {
+        String sql = """
+        SELECT r.rname
+                FROM UserRole er
+                JOIN [Role] r ON er.rid = r.rid
+                WHERE er.uid = ?
+    """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, e.getId());
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                String role = rs.getString("rname");
+                if (role != null && role.toLowerCase().contains("head")) {
+                    return true; // ✅ Là Division Leader
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isManager(int empId) throws SQLException {
+        String sql = """
+        SELECT r.rname
+        FROM EmployeeRole er
+        JOIN [Role] r ON er.rid = r.rid
+        WHERE er.eid = ?
+    """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, empId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                String role = rs.getString("rname");
+                if (role != null && role.toLowerCase().contains("pm")) {
+                    return true; // ✅ Có role chứa "PM" → là Manager
+                }
+            }
+        }
+        return false;
+    }
+
+    // ✅ Nhân viên chỉnh sửa đơn (chưa duyệt)
+    public void updateRequest(int rid, String reason, String from, String to) {
+        String sql = """
+            UPDATE RequestForLeave
+            SET reason = ?, [from] = ?, [to] = ?
+            WHERE rid = ? AND status = 1
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, reason);
+            stm.setDate(2, Date.valueOf(from));
+            stm.setDate(3, Date.valueOf(to));
+            stm.setInt(4, rid);
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("updateRequest error: " + e.getMessage());
+        }
+    }
+
+    // ✅ Helper map ResultSet -> Object
+    private RequestForLeave mapResult(ResultSet rs) throws SQLException {
+        RequestForLeave r = new RequestForLeave();
+        r.setId(rs.getInt("rid"));
+        r.setCreatedBy(empDB.get(rs.getInt("created_by")));
+        r.setCreatedTime(rs.getTimestamp("created_time"));
+        r.setFrom(rs.getDate("from"));
+        r.setTo(rs.getDate("to"));
+        r.setReason(rs.getString("reason"));
+        r.setStatus(rs.getInt("status"));
+
+        int pid = rs.getInt("processed_by");
+        if (!rs.wasNull()) {
+            r.setProcessedBy(empDB.get(pid));
+        }
+
+        r.setProcessReason(rs.getString("process_reason"));
+        r.setProcessedTime(rs.getTimestamp("processed_time"));
+        return r;
+    }
+
+    // ✅ CRUD cơ bản
     @Override
     public ArrayList<RequestForLeave> list() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public RequestForLeave get(int id) {
-        return null;
+        RequestForLeave r = null;
+        String sql = "SELECT * FROM RequestForLeave WHERE rid = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                r = mapResult(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return r;
+    }
+
+    @Override
+    public void insert(RequestForLeave model) {
+        String sql = """
+            INSERT INTO RequestForLeave(created_by, created_time, [from], [to], reason, status)
+            VALUES (?, GETDATE(), ?, ?, ?, 1)
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, model.getCreatedBy().getId());
+            stm.setDate(2, model.getFrom());
+            stm.setDate(3, model.getTo());
+            stm.setString(4, model.getReason());
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -161,5 +292,12 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
 
     @Override
     public void delete(RequestForLeave model) {
+        String sql = "DELETE FROM RequestForLeave WHERE rid = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, model.getId());
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

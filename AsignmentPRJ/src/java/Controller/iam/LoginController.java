@@ -29,20 +29,7 @@ public class LoginController extends HttpServlet {
         
         UserDBContext db = new UserDBContext();
         User u = db.get(username, password);
-//        if(u!=null)
-//        {
-//            HttpSession session = req.getSession();
-//            session.setAttribute("auth", u);
-//            //print login successful!
-//            req.setAttribute("message", "Login Successful!");
-//        }
-//        else
-//        {
-//            req.setAttribute("message", "Login Failed!");
-//        }
-//        req.getRequestDispatcher("view/auth/message.jsp").forward(req, resp);
-//
-//    }
+
 
         if (u != null) {
             // Bước 3: Đăng nhập thành công -> lưu session
