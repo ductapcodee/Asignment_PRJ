@@ -105,69 +105,6 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
         }
     }
 
-    // ✅ Reprocess có kiểm tra quyền và ngày
-    public boolean reprocessRequest(int requestId, int newStatus, String reason, Employee processor) {
-        String sqlCheck = """
-            SELECT r.rid, r.status, r.processed_by, r.[from], e.eid as empId, e.supervisorid, e.did
-            FROM RequestForLeave r
-            JOIN Employee e ON e.eid = r.created_by
-            WHERE r.rid = ?
-        """;
-        try (PreparedStatement stm = connection.prepareStatement(sqlCheck)) {
-            stm.setInt(1, requestId);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                Date fromDate = rs.getDate("from");
-                int oldStatus = rs.getInt("status");
-                int prevProcessedBy = rs.getInt("processed_by");
-                int empDivision = rs.getInt("did");
-                int empId = rs.getInt("empId");
-                int supervisorId = rs.getInt("supervisorid");
-
-                // ❌ Nếu ngày nghỉ còn < 2 ngày thì không được reprocess
-                long diffDays = (fromDate.getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
-                if (diffDays < 2) {
-                    System.out.println(">>> Reprocess denied: too close to leave date");
-                    return false;
-                }
-
-                // ✅ Nếu là Division Leader → có thể reprocess đơn đã xử lý bởi PM
-                if (isDivisionLeader(processor)) {
-                    // Cho phép override mọi đơn đã được xử lý bởi Manager (PM)
-                    if (prevProcessedBy != 0 && isManager(prevProcessedBy)) {
-                        return updateReprocess(requestId, newStatus, reason, processor.getId());
-                    }
-                }
-
-                // ✅ Nếu là Manager và đơn của cấp dưới (supervisorid = mình)
-                if (isManager(processor.getId()) && supervisorId == processor.getId()) {
-                    return updateReprocess(requestId, newStatus, reason, processor.getId());
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private boolean updateReprocess(int rid, int status, String reason, int processedBy) throws SQLException {
-        String sql = """
-            UPDATE RequestForLeave
-            SET status = ?, 
-                process_reason = ?, 
-                processed_by = ?, 
-                processed_time = GETDATE()
-            WHERE rid = ?
-        """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, status);
-            stm.setString(2, reason);
-            stm.setInt(3, processedBy);
-            stm.setInt(4, rid);
-            return stm.executeUpdate() > 0;
-        }
-    }
-
     private boolean isDivisionLeader(Employee e) throws SQLException {
         String sql = """
         SELECT r.rname
