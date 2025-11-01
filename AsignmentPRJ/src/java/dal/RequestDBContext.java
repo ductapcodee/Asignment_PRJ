@@ -128,9 +128,9 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
     private boolean isManager(int empId) throws SQLException {
         String sql = """
         SELECT r.rname
-        FROM EmployeeRole er
+        FROM UserRole er
         JOIN [Role] r ON er.rid = r.rid
-        WHERE er.eid = ?
+        WHERE er.uid = ?
     """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, empId);
@@ -206,18 +206,50 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
         return r;
     }
 
+//    @Override
+//    public void insert(RequestForLeave model) {
+//        String sql = """
+//            INSERT INTO RequestForLeave(created_by, created_time, [from], [to], reason, status)
+//            VALUES (?, GETDATE(), ?, ?, ?, 1)
+//        """;
+//        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+//            stm.setInt(1, model.getCreatedBy().getId());
+//            stm.setDate(2, model.getFrom());
+//            stm.setDate(3, model.getTo());
+//            stm.setString(4, model.getReason());
+//            stm.executeUpdate();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
     @Override
     public void insert(RequestForLeave model) {
-        String sql = """
+        try {
+            Employee creator = model.getCreatedBy();
+
+            // Kiểm tra role
+            boolean isLeader = isDivisionLeader(creator);  // Head / Leader
+//            boolean isManager = isManager(creator.getId()); // PM / Manager
+
+            int status = 1; // Pending mặc định
+            if (isLeader) {
+                status = 2; // ✅ Auto-Approved
+            }
+
+            String sql = """
             INSERT INTO RequestForLeave(created_by, created_time, [from], [to], reason, status)
-            VALUES (?, GETDATE(), ?, ?, ?, 1)
+            VALUES (?, GETDATE(), ?, ?, ?, ?)
         """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, model.getCreatedBy().getId());
-            stm.setDate(2, model.getFrom());
-            stm.setDate(3, model.getTo());
-            stm.setString(4, model.getReason());
-            stm.executeUpdate();
+
+            try (PreparedStatement stm = connection.prepareStatement(sql)) {
+                stm.setInt(1, creator.getId());
+                stm.setDate(2, model.getFrom());
+                stm.setDate(3, model.getTo());
+                stm.setString(4, model.getReason());
+                stm.setInt(5, status);
+                stm.executeUpdate();
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

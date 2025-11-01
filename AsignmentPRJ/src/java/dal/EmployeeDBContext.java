@@ -202,4 +202,49 @@ public class EmployeeDBContext extends DBContext<Employee> {
             closeConnection();
         }
     }
+
+    //7. Division Leader: lấy toàn bộ division
+    public ArrayList<Employee> getEmployeesByDivision(int divisionId) {
+        ArrayList<Employee> list = new ArrayList<>();
+        String sql = """
+        SELECT e.eid, e.ename, e.did, d.dname, e.supervisorid, s.ename AS sname
+        FROM Employee e
+        JOIN Division d ON e.did = d.did
+        LEFT JOIN Employee s ON e.supervisorid = s.eid
+        WHERE e.did = ?
+        ORDER BY e.ename
+    """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, divisionId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Employee e = new Employee();
+                e.setId(rs.getInt("eid"));
+                e.setName(rs.getString("ename"));
+
+                Division d = new Division();
+                d.setId(rs.getInt("did"));
+                d.setDname(rs.getString("dname"));
+                e.setDivision(d);
+
+                int supId = rs.getInt("supervisorid");
+                if (!rs.wasNull()) {
+                    Employee sup = new Employee();
+                    sup.setId(supId);
+                    sup.setName(rs.getString("sname"));
+                    e.setSupervisor(sup);
+                }
+
+                list.add(e);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+
+        return list;
+    }
+
 }
