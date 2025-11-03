@@ -426,7 +426,7 @@
                         <div class="action-icon">
                             <i class="bi bi-calendar-event"></i>
                         </div>
-                        <div class="action-title">Lịch Nghỉ Phép</div>
+                        <div class="action-title">Leave Agenda</div>
                         <div class="action-description">
                             Xem lịch nghỉ phép của nhân viên theo tháng
                         </div>
@@ -448,7 +448,7 @@
                         <div class="action-icon">
                             <i class="bi bi-people"></i>
                         </div>
-                        <div class="action-title">Tổng Quan Team</div>
+                        <div class="action-title">Oveview Team</div>
                         <div class="action-description">
                             Xem chi tiết thông tin nghỉ phép của từng nhân viên
                         </div>
@@ -456,45 +456,6 @@
                 </div>
             </c:if>
 
-            <!-- Quick Stats for Leaders -->
-            <c:if test="${isDivisionLeader}">
-                <div class="welcome-card" style="margin-top: 30px;">
-                    <h3 style="font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 20px;">
-                        <i class="bi bi-info-circle"></i> Thông tin nhanh
-                    </h3>
-                    <div class="row">
-                        <div class="col-md-3 col-6 mb-3">
-                            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-                                <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">--</div>
-                                <div style="font-size: 14px; color: #718096;">Đơn chờ duyệt</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-                                <div style="font-size: 32px; font-weight: 700; color: #10b981;">--</div>
-                                <div style="font-size: 14px; color: #718096;">Đã duyệt</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-                                <div style="font-size: 32px; font-weight: 700; color: #f59e0b;">--</div>
-                                <div style="font-size: 14px; color: #718096;">Nghỉ hôm nay</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-                                <div style="font-size: 32px; font-weight: 700; color: #8b5cf6;">--</div>
-                                <div style="font-size: 14px; color: #718096;">Tổng nhân viên</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 15px;">
-                        <a href="${pageContext.request.contextPath}/request/dashboard" style="color: #667eea; text-decoration: none; font-weight: 600;">
-                            Xem chi tiết tại Dashboard →
-                        </a>
-                    </div>
-                </div>
-            </c:if>
 
             <!-- Logout Section -->
             <div class="logout-section">

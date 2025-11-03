@@ -337,6 +337,22 @@
                 }
             }
             /*btn*/
+             .btn-primary-home {
+                background: linear-gradient(135deg, #6a5af9 0%, #836fff 100%);
+                color: white;
+                padding: 10px 22px;
+                border-radius: 999px; /* bo tròn đẹp */
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                box-shadow: 0 3px 8px rgba(106, 90, 249, 0.3);
+                transition: 0.25s ease;
+                display: inline-block;
+            }
+
+            /* Hover: sáng hơn + nổi lên */
             .btn-primary-home:hover {
                 background: linear-gradient(135deg, #7c6cfa 0%, #9a82ff 100%);
                 transform: translateY(-2px);
@@ -351,10 +367,10 @@
                 Dashboard / Leave Management / Agenda
             </div>
             <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                    <a href="${pageContext.request.contextPath}/home" class="btn-primary-home">
-                        Về Trang Chủ
-                    </a>
-                </div>
+                <a href="${pageContext.request.contextPath}/home" class="btn-primary-home">
+                    Về Trang Chủ
+                </a>
+            </div>
         </div>
 
         <!-- Statistics Cards -->

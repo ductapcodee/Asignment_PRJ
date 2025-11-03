@@ -50,4 +50,4 @@ public class Employee extends BaseModel {
     public void setSupervisor(Employee supervisor) {
         this.supervisor = supervisor;
     }
-}
+    }

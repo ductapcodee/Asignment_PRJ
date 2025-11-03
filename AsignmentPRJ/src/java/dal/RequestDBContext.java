@@ -206,22 +206,6 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
         return r;
     }
 
-//    @Override
-//    public void insert(RequestForLeave model) {
-//        String sql = """
-//            INSERT INTO RequestForLeave(created_by, created_time, [from], [to], reason, status)
-//            VALUES (?, GETDATE(), ?, ?, ?, 1)
-//        """;
-//        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-//            stm.setInt(1, model.getCreatedBy().getId());
-//            stm.setDate(2, model.getFrom());
-//            stm.setDate(3, model.getTo());
-//            stm.setString(4, model.getReason());
-//            stm.executeUpdate();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
     @Override
     public void insert(RequestForLeave model) {
         try {

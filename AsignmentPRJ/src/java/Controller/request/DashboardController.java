@@ -12,9 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.*;
 import model.RequestForLeave;
 import model.iam.User;
 
@@ -38,14 +38,17 @@ public class DashboardController extends BaseRequiredAuthenticationController {
         } else {
             requests = db.getRequestsOfEmployee(user.getEmployee().getId());
         }
-        
-        // ✅ Tính toán statistics
+
+        // ✅ Lấy lựa chọn quý
+        String quarterParam = req.getParameter("quarter");
+        int quarter = quarterParam != null && !quarterParam.isEmpty() ? Integer.parseInt(quarterParam) : 0;
+
         Map<String, Integer> stats = calculateStatistics(requests);
-        Map<String, Integer> monthlyStats = calculateMonthlyStats(requests);
+        Map<String, Integer> monthlyStats = calculateQuarterlyStats(requests, quarter);
         ArrayList<RequestForLeave> upcomingLeaves = getUpcomingLeaves(requests);
         ArrayList<RequestForLeave> pendingRequests = getPendingRequests(requests);
-        Map<String, Integer> employeeLeaveCount = getEmployeeLeaveCount(requests);
-        
+        Map<String, Integer> employeeLeaveCount = getEmployeeLeaveDays(requests);
+
         // ✅ Gửi data sang JSP
         req.setAttribute("stats", stats);
         req.setAttribute("monthlyStats", monthlyStats);
@@ -53,7 +56,8 @@ public class DashboardController extends BaseRequiredAuthenticationController {
         req.setAttribute("pendingRequests", pendingRequests);
         req.setAttribute("employeeLeaveCount", employeeLeaveCount);
         req.setAttribute("role", role);
-        
+        req.setAttribute("selectedQuarter", quarter);
+
         req.getRequestDispatcher("../view/request/dashboard.jsp").forward(req, resp);
     }
     
@@ -62,15 +66,15 @@ public class DashboardController extends BaseRequiredAuthenticationController {
             throws ServletException, IOException {
         doGet(req, resp, user);
     }
-    
-    // ✅ Tính thống kê tổng quan
+
+    // ✅ Tổng quan
     private Map<String, Integer> calculateStatistics(ArrayList<RequestForLeave> requests) {
         Map<String, Integer> stats = new HashMap<>();
         stats.put("total", requests.size());
         stats.put("pending", countByStatus(requests, 1));
         stats.put("approved", countByStatus(requests, 2));
         stats.put("rejected", countByStatus(requests, 3));
-        
+
         // Tính số ngày nghỉ approved trong tháng này
         int approvedDays = 0;
         LocalDate now = LocalDate.now();
@@ -87,36 +91,44 @@ public class DashboardController extends BaseRequiredAuthenticationController {
         
         return stats;
     }
-    
-    // ✅ Thống kê theo tháng
-    private Map<String, Integer> calculateMonthlyStats(ArrayList<RequestForLeave> requests) {
-        Map<String, Integer> monthlyStats = new HashMap<>();
+
+    // ✅ Theo quý (Quarter)
+    private Map<String, Integer> calculateQuarterlyStats(ArrayList<RequestForLeave> requests, int quarter) {
+        Map<String, Integer> stats = new LinkedHashMap<>();
         LocalDate now = LocalDate.now();
-        
-        for (int i = 0; i < 6; i++) {
-            LocalDate month = now.minusMonths(i);
+        int year = now.getYear();
+
+        List<Month> months = switch (quarter) {
+            case 1 -> List.of(Month.JANUARY, Month.FEBRUARY, Month.MARCH);
+            case 2 -> List.of(Month.APRIL, Month.MAY, Month.JUNE);
+            case 3 -> List.of(Month.JULY, Month.AUGUST, Month.SEPTEMBER);
+            case 4 -> List.of(Month.OCTOBER, Month.NOVEMBER, Month.DECEMBER);
+            default -> Arrays.asList(Month.values()); // All months
+        };
+
+        for (Month m : months) {
             int count = 0;
             for (RequestForLeave r : requests) {
-                LocalDate from = r.getFrom().toLocalDate();
-                if (from.getMonthValue() == month.getMonthValue() && 
-                    from.getYear() == month.getYear() && 
-                    r.getStatus() == 2) {
-                    count++;
+                if (r.getStatus() == 2) {
+                    LocalDate from = r.getFrom().toLocalDate();
+                    if (from.getMonthValue() == m.getValue() && from.getYear() == year) {
+                        count++;
+                    }
                 }
             }
-            monthlyStats.put(month.getMonth().toString(), count);
+            stats.put(m.getDisplayName(TextStyle.SHORT, Locale.ENGLISH), count);
         }
-        return monthlyStats;
+
+        return stats;
     }
-    
-    // ✅ Lấy danh sách nghỉ sắp tới (7 ngày tới)
+
     private ArrayList<RequestForLeave> getUpcomingLeaves(ArrayList<RequestForLeave> requests) {
         ArrayList<RequestForLeave> upcoming = new ArrayList<>();
         LocalDate now = LocalDate.now();
         LocalDate weekLater = now.plusDays(7);
         
         for (RequestForLeave r : requests) {
-            if (r.getStatus() == 2) { // Chỉ lấy đã approved
+            if (r.getStatus() == 2) {
                 LocalDate from = r.getFrom().toLocalDate();
                 if (!from.isBefore(now) && !from.isAfter(weekLater)) {
                     upcoming.add(r);
@@ -125,40 +137,39 @@ public class DashboardController extends BaseRequiredAuthenticationController {
         }
         return upcoming;
     }
-    
+
     // ✅ Lấy pending requests cần xử lý
     private ArrayList<RequestForLeave> getPendingRequests(ArrayList<RequestForLeave> requests) {
         ArrayList<RequestForLeave> pending = new ArrayList<>();
         for (RequestForLeave r : requests) {
-            if (r.getStatus() == 1) {
-                pending.add(r);
-            }
+            if (r.getStatus() == 1) pending.add(r);
         }
-        // Sort by created_time DESC
         pending.sort((r1, r2) -> r2.getCreatedTime().compareTo(r1.getCreatedTime()));
         return pending;
     }
-    
-    // ✅ Đếm số lần nghỉ của từng nhân viên
-    private Map<String, Integer> getEmployeeLeaveCount(ArrayList<RequestForLeave> requests) {
-        Map<String, Integer> count = new HashMap<>();
+
+    // ✅ Employee Leave Count — đếm theo số ngày nghỉ (int)
+    private Map<String, Integer> getEmployeeLeaveDays(ArrayList<RequestForLeave> requests) {
+        Map<String, Integer> count = new LinkedHashMap<>();
         for (RequestForLeave r : requests) {
-            if (r.getStatus() == 2) { // Chỉ đếm approved
+            if (r.getStatus() == 2) {
                 String name = r.getCreatedBy().getName();
-                count.put(name, count.getOrDefault(name, 0) + 1);
+                LocalDate from = r.getFrom().toLocalDate();
+                LocalDate to = r.getTo().toLocalDate();
+                int days = (int) (to.toEpochDay() - from.toEpochDay() + 1);
+                count.put(name, count.getOrDefault(name, 0) + days);
             }
         }
         return count;
     }
-    
+
     private int countByStatus(ArrayList<RequestForLeave> requests, int status) {
-        int count = 0;
-        for (RequestForLeave r : requests) {
-            if (r.getStatus() == status) count++;
-        }
-        return count;
+        int c = 0;
+        for (RequestForLeave r : requests)
+            if (r.getStatus() == status) c++;
+        return c;
     }
-    
+
     private String getUserRole(User user) {
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             return user.getRoles().get(0).getRname().toLowerCase();

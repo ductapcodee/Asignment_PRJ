@@ -87,13 +87,9 @@ public class TeamOverviewController extends BaseRequiredAuthenticationController
         public int approvedRequests;
         public int pendingRequests;
         public int totalLeaveDays;
-        public int remainingLeaveQuota; // Giả sử mỗi người có 20 ngày/năm
         public LocalDate lastLeaveDate;
         public boolean isOnLeaveToday;
 
-        public EmployeeMetrics() {
-            this.remainingLeaveQuota = 20; // Default annual leave quota
-        }
 
         public int getTotalRequests() {
             return totalRequests;
@@ -125,14 +121,6 @@ public class TeamOverviewController extends BaseRequiredAuthenticationController
 
         public void setTotalLeaveDays(int totalLeaveDays) {
             this.totalLeaveDays = totalLeaveDays;
-        }
-
-        public int getRemainingLeaveQuota() {
-            return remainingLeaveQuota;
-        }
-
-        public void setRemainingLeaveQuota(int remainingLeaveQuota) {
-            this.remainingLeaveQuota = remainingLeaveQuota;
         }
 
         public LocalDate getLastLeaveDate() {
@@ -198,10 +186,7 @@ public class TeamOverviewController extends BaseRequiredAuthenticationController
             }
         }
 
-        // Calculate remaining quota
-        for (EmployeeMetrics metrics : map.values()) {
-            metrics.remainingLeaveQuota = 20 - metrics.totalLeaveDays;
-        }
+
 
         return map;
     }
