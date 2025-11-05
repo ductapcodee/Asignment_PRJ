@@ -217,7 +217,8 @@
                         </div>
                     </div>
                     <div>
-                        <a class="btn-small btn-view" href="${pageContext.request.contextPath}/view/request/review.jsp?id=<%=r.getId()%>">View</a>
+                        <a class="btn-small btn-view" href="${pageContext.request.contextPath}/request/review?rid=<%=r.getId()%>">View</a>
+
 
                     </div>
                 </div>
