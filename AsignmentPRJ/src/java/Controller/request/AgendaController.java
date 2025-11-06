@@ -78,6 +78,7 @@ public class AgendaController extends BaseRequiredAuthenticationController {
         req.setAttribute("today", today);
 
         req.getRequestDispatcher("../view/request/agenda.jsp").forward(req, resp);
+
     }
 
     @Override

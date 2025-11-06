@@ -480,39 +480,39 @@
                         </c:if>
 
                         <c:set var="start" value="${pageindex - 2}"/>
-<c:set var="end" value="${pageindex + 2}"/>
+                        <c:set var="end" value="${pageindex + 2}"/>
 
-<c:if test="${start < 1}">
-    <c:set var="end" value="${end + (1 - start)}"/>
-    <c:set var="start" value="1"/>
-</c:if>
+                        <c:if test="${start < 1}">
+                            <c:set var="end" value="${end + (1 - start)}"/>
+                            <c:set var="start" value="1"/>
+                        </c:if>
 
-<c:if test="${end > totalpage}">
-    <c:set var="start" value="${start - (end - totalpage)}"/>
-    <c:set var="end" value="${totalpage}"/>
-</c:if>
+                        <c:if test="${end > totalpage}">
+                            <c:set var="start" value="${start - (end - totalpage)}"/>
+                            <c:set var="end" value="${totalpage}"/>
+                        </c:if>
 
-<c:if test="${start < 1}">
-    <c:set var="start" value="1"/>
-</c:if>
+                        <c:if test="${start < 1}">
+                            <c:set var="start" value="1"/>
+                        </c:if>
 
-<!-- Page Numbers -->
-<c:forEach var="i" begin="${start}" end="${end}">
-    <a href="${pageContext.request.contextPath}/request/list?page=${i}"
-       style="
-           margin:0 4px;
-           padding:8px 14px;
-           border-radius:8px;
-           text-decoration:none;
-           font-weight:600;
-           color:${i == pageindex ? 'white' : '#4f46e5'};
-           background:${i == pageindex ? 'linear-gradient(135deg,#6a5af9,#836fff)' : 'white'};
-           box-shadow:0 2px 6px rgba(0,0,0,0.15);
-           border:1px solid #ddd;
-           transition:0.25s;">
-        ${i}
-    </a>
-</c:forEach>
+                        <!-- Page Numbers -->
+                        <c:forEach var="i" begin="${start}" end="${end}">
+                            <a href="${pageContext.request.contextPath}/request/list?page=${i}"
+                               style="
+                               margin:0 4px;
+                               padding:8px 14px;
+                               border-radius:8px;
+                               text-decoration:none;
+                               font-weight:600;
+                               color:${i == pageindex ? 'white' : '#4f46e5'};
+                               background:${i == pageindex ? 'linear-gradient(135deg,#6a5af9,#836fff)' : 'white'};
+                               box-shadow:0 2px 6px rgba(0,0,0,0.15);
+                               border:1px solid #ddd;
+                               transition:0.25s;">
+                                ${i}
+                            </a>
+                        </c:forEach>
 
 
                         <!-- Next -->

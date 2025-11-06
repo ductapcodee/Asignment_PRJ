@@ -25,7 +25,7 @@ public class ReportController extends BaseRequiredAuthenticationController {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp, User user)
             throws ServletException, IOException {
 
-        String format = req.getParameter("format"); // csv, excel, pdf
+        String format = req.getParameter("format");
         String fromDate = req.getParameter("from");
         String toDate = req.getParameter("to");
         String status = req.getParameter("status");
@@ -34,41 +34,58 @@ public class ReportController extends BaseRequiredAuthenticationController {
         RequestDBContext db = new RequestDBContext();
         ArrayList<RequestForLeave> requests = getRequestsByRole(db, user);
 
-        // ✅ Nếu cả hai đều trống → hiển thị toàn bộ
-        if ((fromDate == null || fromDate.isEmpty()) && (toDate == null || toDate.isEmpty())) {
-            // Không filter gì cả
-        } else if (fromDate != null && toDate != null && !fromDate.isEmpty() && !toDate.isEmpty()) {
-            try {
-                LocalDate from = LocalDate.parse(fromDate);
-                LocalDate to = LocalDate.parse(toDate);
+        // ===== Filter Date =====
+        if ((fromDate != null && !fromDate.isEmpty()) && (toDate != null && !toDate.isEmpty())) {
+            LocalDate from = LocalDate.parse(fromDate);
+            LocalDate to = LocalDate.parse(toDate);
 
-                if (from.isAfter(to)) {
-                    req.setAttribute("error", "❌ 'From Date' cannot be later than 'To Date'. Please select a valid range.");
-                    req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
-                    return;
-                }
-
-                requests = filterByDateRange(requests, fromDate, toDate);
-            } catch (Exception e) {
-                req.setAttribute("error", "⚠️ Invalid date format. Please select valid dates.");
+            if (from.isAfter(to)) {
+                req.setAttribute("error", "❌ 'From Date' cannot be later than 'To Date'.");
                 req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
                 return;
             }
+
+            requests = filterByDateRange(requests, fromDate, toDate);
         }
 
-        // ✅ Filter theo status
+        // ===== Filter Status =====
         if (status != null && !status.equals("all")) {
             requests = filterByStatus(requests, Integer.parseInt(status));
         }
 
-        // ✅ Export theo format
+        // ===== Export =====
         if ("excel".equals(format)) {
             exportToExcel(resp, requests);
-        } else {
-            // Default: Show report page
-            req.setAttribute("requests", requests);
-            req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
+            return; // ✅ STOP here, không chạy xuống phân trang
         }
+
+        // ===== Pagination =====
+        int pagesize = 7;
+        int totalRecords = requests.size();
+        int totalPages = (totalRecords + pagesize - 1) / pagesize;
+        String page_raw = req.getParameter("page");
+        int pageindex = 1;
+        try {
+            if (page_raw != null && !page_raw.isEmpty()) {
+                pageindex = Integer.parseInt(page_raw.trim());  // ✅ trim tránh lỗi
+            }
+        } catch (Exception e) {
+            pageindex = 1;  // fallback
+        }
+
+        pageindex = Math.max(1, Math.min(pageindex, totalPages));
+
+        int fromIndex = (pageindex - 1) * pagesize;
+        int toIndex = Math.min(fromIndex + pagesize, totalRecords);
+
+        ArrayList<RequestForLeave> pageList = new ArrayList<>(requests.subList(fromIndex, toIndex));
+
+        // ===== Send to JSP =====
+        req.setAttribute("requests", pageList);
+        req.setAttribute("pageindex", pageindex);
+        req.setAttribute("totalPages", totalPages);
+
+        req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
     }
 
     @Override
@@ -76,7 +93,6 @@ public class ReportController extends BaseRequiredAuthenticationController {
             throws ServletException, IOException {
         doGet(req, resp, user);
     }
-
 
     // ✅ Export to Excel (HTML table with Excel MIME type)
     private void exportToExcel(HttpServletResponse resp, ArrayList<RequestForLeave> requests)

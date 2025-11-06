@@ -337,7 +337,7 @@
                 }
             }
             /*btn*/
-             .btn-primary-home {
+            .btn-primary-home {
                 background: linear-gradient(135deg, #6a5af9 0%, #836fff 100%);
                 color: white;
                 padding: 10px 22px;
@@ -416,6 +416,7 @@
         </div>
 
         <!-- View Toggle -->
+        <c:set var="view" value="${param.view != null ? param.view : 'calendar'}"/>
         <div class="view-mode-toggle">
             <button class="btn-view active" onclick="switchView('calendar')">📅 Calendar View</button>
             <button class="btn-view" onclick="switchView('list')">📋 List View</button>
@@ -527,6 +528,8 @@
                     </div>
                 </div>
             </c:forEach>
+            </div>
+
         </div>
 
         <script>

@@ -641,6 +641,91 @@
                             </c:forEach>
                         </tbody>
                     </table>
+                    <!-- Pagination -->
+                    <c:if test="${totalPages != null && totalPages > 0}">
+                        <div style="margin-top:20px; text-align:center;">
+
+                            <!-- Prev -->
+                            <c:if test="${pageindex > 1}">
+                                <a href="${pageContext.request.contextPath}/request/report?page=${pageindex - 1}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
+                                   style="padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; background:white; border:1px solid #ddd; box-shadow:0 2px 6px rgba(0,0,0,0.15); color:#4f46e5; transition:0.2s;">
+                                    « Prev
+                                </a>
+                            </c:if>
+
+                            <!-- compute start/end with window = 2 -->
+                            <c:set var="window" value="2" />
+                            <c:set var="start" value="${pageindex - window}" />
+                            <c:set var="end" value="${pageindex + window}" />
+
+                            <!-- if start < 1, push end to right -->
+                            <c:if test="${start < 1}">
+                                <c:set var="end" value="${end + (1 - start)}" />
+                                <c:set var="start" value="1" />
+                            </c:if>
+
+                            <!-- if end > totalPages, push start to left -->
+                            <c:if test="${end > totalPages}">
+                                <c:set var="start" value="${start - (end - totalPages)}" />
+                                <c:set var="end" value="${totalPages}" />
+                            </c:if>
+
+                            <!-- final clamp to bounds -->
+                            <c:if test="${start < 1}">
+                                <c:set var="start" value="1" />
+                            </c:if>
+                            <c:if test="${end > totalPages}">
+                                <c:set var="end" value="${totalPages}" />
+                            </c:if>
+
+                            <!-- If there are pages before start, show first + ellipsis -->
+                            <c:if test="${start > 1}">
+                                <a href="${pageContext.request.contextPath}/request/report?page=1&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
+                                   style="margin:0 4px; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; color:#4f46e5; background:white; border:1px solid #ddd;">
+                                    1
+                                </a>
+                                <span style="margin:0 6px; color:#9ca3af;">…</span>
+                            </c:if>
+
+                            <!-- Page numbers from start to end -->
+                            <c:forEach var="i" begin="${start}" end="${end}">
+                                <c:choose>
+                                    <c:when test="${i == pageindex}">
+                                        <span style="margin:0 4px; padding:8px 14px; border-radius:8px; font-weight:600; color:white; background:linear-gradient(135deg,#6a5af9,#836fff); border:1px solid #ddd;">
+                                            ${i}
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="${pageContext.request.contextPath}/request/report?page=${i}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
+                                           style="margin:0 4px; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; color:#4f46e5; background:white; border:1px solid #ddd;">
+                                            ${i}
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+
+                            <!-- If there are pages after end, show ellipsis + last -->
+                            <c:if test="${end < totalPages}">
+                                <span style="margin:0 6px; color:#9ca3af;">…</span>
+                                <a href="${pageContext.request.contextPath}/request/report?page=${totalPages}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
+                                   style="margin:0 4px; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; color:#4f46e5; background:white; border:1px solid #ddd;">
+                                    ${totalPages}
+                                </a>
+                            </c:if>
+
+                            <!-- Next -->
+                            <c:if test="${pageindex < totalPages}">
+                                <a href="${pageContext.request.contextPath}/request/report?page=${pageindex + 1}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
+                                   style="padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; background:white; border:1px solid #ddd; box-shadow:0 2px 6px rgba(0,0,0,0.15); color:#4f46e5; transition:0.2s;">
+                                    Next »
+                                </a>
+                            </c:if>
+
+                        </div>
+                    </c:if>
+
+
+
                 </div>
             </c:if>
         </div>
