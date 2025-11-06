@@ -12,7 +12,122 @@ import model.RequestForLeave;
 public class RequestDBContext extends DBContext<RequestForLeave> {
 
     private final EmployeeDBContext empDB = new EmployeeDBContext();
+    
+    // Count Employee Requests
+public int countRequestsOfEmployee(int empId) {
+    String sql = "SELECT COUNT(*) FROM RequestForLeave WHERE created_by = ?";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, empId);
+        ResultSet rs = stm.executeQuery();
+        if (rs.next()) return rs.getInt(1);
+    } catch (SQLException e) { }
+    return 0;
+}
 
+// Pagination - Employee
+public ArrayList<RequestForLeave> getRequestsOfEmployee(int empId, int pageindex, int pagesize) {
+    ArrayList<RequestForLeave> list = new ArrayList<>();
+    String sql = """
+        SELECT r.rid, r.created_by, r.created_time, r.[from], r.[to], r.reason, r.status,
+               r.processed_by, r.process_reason, r.processed_time
+        FROM RequestForLeave r
+        WHERE r.created_by = ?
+        ORDER BY r.created_time DESC
+        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+    """;
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, empId);
+        stm.setInt(2, (pageindex - 1) * pagesize);
+        stm.setInt(3, pagesize);
+        ResultSet rs = stm.executeQuery();
+        while (rs.next()) list.add(mapResult(rs));
+    } catch (SQLException e) {}
+    return list;
+}
+public int countRequestsOfManager(int managerId) {
+    String sql = """
+        SELECT COUNT(*)
+        FROM RequestForLeave r
+        WHERE r.created_by = ? 
+           OR r.created_by IN (SELECT eid FROM Employee WHERE supervisorid = ?)
+    """;
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, managerId);
+        stm.setInt(2, managerId);
+        ResultSet rs = stm.executeQuery();
+        if (rs.next()) return rs.getInt(1);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+public ArrayList<RequestForLeave> getRequestsOfManager(int managerId, int pageindex, int pagesize) {
+    ArrayList<RequestForLeave> list = new ArrayList<>();
+    String sql = """
+        SELECT r.rid, r.created_by, r.created_time, r.[from], r.[to], r.reason, r.status,
+               r.processed_by, r.process_reason, r.processed_time
+        FROM RequestForLeave r
+        WHERE r.created_by = ? 
+           OR r.created_by IN (SELECT eid FROM Employee WHERE supervisorid = ?)
+        ORDER BY r.created_time DESC
+        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+    """;
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, managerId);
+        stm.setInt(2, managerId);
+        stm.setInt(3, (pageindex - 1) * pagesize);
+        stm.setInt(4, pagesize);
+
+        ResultSet rs = stm.executeQuery();
+        while (rs.next()) list.add(mapResult(rs));
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+public int countRequestsOfDivision(int divisionId) {
+    String sql = """
+        SELECT COUNT(*)
+        FROM RequestForLeave r
+        JOIN Employee e ON r.created_by = e.eid
+        WHERE e.did = ?
+    """;
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, divisionId);
+        ResultSet rs = stm.executeQuery();
+        if (rs.next()) return rs.getInt(1);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+public ArrayList<RequestForLeave> getRequestsOfDivision(int divisionId, int pageindex, int pagesize) {
+    ArrayList<RequestForLeave> list = new ArrayList<>();
+    String sql = """
+        SELECT r.rid, r.created_by, r.created_time, r.[from], r.[to], r.reason, r.status,
+               r.processed_by, r.process_reason, r.processed_time
+        FROM RequestForLeave r
+        JOIN Employee e ON r.created_by = e.eid
+        WHERE e.did = ?
+        ORDER BY r.created_time DESC
+        OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+    """;
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, divisionId);
+        stm.setInt(2, (pageindex - 1) * pagesize);
+        stm.setInt(3, pagesize);
+
+        ResultSet rs = stm.executeQuery();
+        while (rs.next()) list.add(mapResult(rs));
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+    
     // ✅ Lấy tất cả request của một nhân viên
     public ArrayList<RequestForLeave> getRequestsOfEmployee(int empId) {
         ArrayList<RequestForLeave> list = new ArrayList<>();

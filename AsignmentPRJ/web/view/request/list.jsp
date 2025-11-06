@@ -459,6 +459,81 @@
                             </c:forEach>
                         </tbody>
                     </table>
+                    <!-- Pagination -->
+                    <div style="display:flex; justify-content:center; align-items:center; margin:20px 0; gap:8px;">
+
+                        <!-- Previous -->
+                        <c:if test="${pageindex > 1}">
+                            <a href="${pageContext.request.contextPath}/request/list?page=${pageindex - 1}"
+                               style="
+                               padding:8px 14px;
+                               border-radius:8px;
+                               text-decoration:none;
+                               font-weight:600;
+                               background:white;
+                               border:1px solid #ddd;
+                               box-shadow:0 2px 6px rgba(0,0,0,0.15);
+                               color:#4f46e5;
+                               transition:0.2s;">
+                                « Trước
+                            </a>
+                        </c:if>
+
+                        <c:set var="start" value="${pageindex - 2}"/>
+<c:set var="end" value="${pageindex + 2}"/>
+
+<c:if test="${start < 1}">
+    <c:set var="end" value="${end + (1 - start)}"/>
+    <c:set var="start" value="1"/>
+</c:if>
+
+<c:if test="${end > totalpage}">
+    <c:set var="start" value="${start - (end - totalpage)}"/>
+    <c:set var="end" value="${totalpage}"/>
+</c:if>
+
+<c:if test="${start < 1}">
+    <c:set var="start" value="1"/>
+</c:if>
+
+<!-- Page Numbers -->
+<c:forEach var="i" begin="${start}" end="${end}">
+    <a href="${pageContext.request.contextPath}/request/list?page=${i}"
+       style="
+           margin:0 4px;
+           padding:8px 14px;
+           border-radius:8px;
+           text-decoration:none;
+           font-weight:600;
+           color:${i == pageindex ? 'white' : '#4f46e5'};
+           background:${i == pageindex ? 'linear-gradient(135deg,#6a5af9,#836fff)' : 'white'};
+           box-shadow:0 2px 6px rgba(0,0,0,0.15);
+           border:1px solid #ddd;
+           transition:0.25s;">
+        ${i}
+    </a>
+</c:forEach>
+
+
+                        <!-- Next -->
+                        <c:if test="${pageindex < totalpage}">
+                            <a href="${pageContext.request.contextPath}/request/list?page=${pageindex + 1}"
+                               style="
+                               padding:8px 14px;
+                               border-radius:8px;
+                               text-decoration:none;
+                               font-weight:600;
+                               background:white;
+                               border:1px solid #ddd;
+                               box-shadow:0 2px 6px rgba(0,0,0,0.15);
+                               color:#4f46e5;
+                               transition:0.2s;">
+                                Tiếp »
+                            </a>
+                        </c:if>
+
+                    </div>
+
                 </div>
             </c:if>
         </div>

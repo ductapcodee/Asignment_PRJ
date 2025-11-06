@@ -38,25 +38,41 @@ public class ListController extends BaseRequiredAuthenticationController {
         Employee current = empDB.get(empId);
         String role = user.getPrimaryRoleName();
 
+        // ✅ Phân trang
+        int pagesize = 7;  // số đơn mỗi trang (bạn có thể chỉnh)
+        String page = req.getParameter("page");
+        int pageindex = (page == null) ? 1 : Integer.parseInt(page);
+
         ArrayList<RequestForLeave> list = new ArrayList<>();
+        int count = 0;
 
         System.out.println(">>> Role: " + role + ", EmpID: " + empId);
 
         if (role.contains("Employee")) {
-            list = requestDB.getRequestsOfEmployee(empId);
-        } else if (role.contains("PM")) {
-            list = requestDB.getRequestsOfManager(empId);
-        } else if (role.contains("Head") || current.getSupervisor() == null) {
-            if (current.getDivision() != null)
-                list = requestDB.getRequestsOfDivision(current.getDivision().getId());
+            list = requestDB.getRequestsOfEmployee(empId, pageindex, pagesize);
+            count = requestDB.countRequestsOfEmployee(empId);
+        } 
+        else if (role.contains("PM")) {
+            list = requestDB.getRequestsOfManager(empId, pageindex, pagesize);
+            count = requestDB.countRequestsOfManager(empId);
+        } 
+        else if (role.contains("Head") || current.getSupervisor() == null) {
+            if (current.getDivision() != null) {
+                list = requestDB.getRequestsOfDivision(current.getDivision().getId(), pageindex, pagesize);
+                count = requestDB.countRequestsOfDivision(current.getDivision().getId());
+            }
         }
 
-        System.out.println(">>> Found requests: " + list.size());
+        int totalpage = (count % pagesize == 0) ? count / pagesize : (count / pagesize) + 1;
+
+        System.out.println(">>> Page " + pageindex + "/" + totalpage + ", Found requests: " + list.size());
 
         req.setAttribute("requests", list);
+        req.setAttribute("pageindex", pageindex);
+        req.setAttribute("totalpage", totalpage);
         req.setAttribute("currentUser", current);
         req.setAttribute("roleName", role);
-        req.setAttribute("nowPlus1", LocalDate.now().plusDays(1));
+
         req.getRequestDispatcher("/view/request/list.jsp").forward(req, resp);
     }
 
