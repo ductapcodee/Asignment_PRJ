@@ -446,7 +446,7 @@
                 <div class="calendar-day-header">Fri</div>
                 <div class="calendar-day-header">Sat</div>
 
-                <jsp:useBean id="requests" scope="request" type="java.util.ArrayList"/>
+                
                 <%
                     java.time.YearMonth ym = (java.time.YearMonth) request.getAttribute("currentMonth");
                     java.time.LocalDate firstDay = ym.atDay(1);
