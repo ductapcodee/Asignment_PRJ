@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [FALL25_Assignment]    Script Date: 10/29/2025 10:42:30 PM ******/
+/****** Object:  Database [FALL25_Assignment]    Script Date: 11/9/2025 7:05:00 PM ******/
 CREATE DATABASE [FALL25_Assignment]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -84,7 +84,7 @@ ALTER DATABASE [FALL25_Assignment] SET QUERY_STORE (OPERATION_MODE = READ_WRITE,
 GO
 USE [FALL25_Assignment]
 GO
-/****** Object:  Table [dbo].[Division]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[Division]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -98,7 +98,7 @@ CREATE TABLE [dbo].[Division](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Employee]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[Employee]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -114,7 +114,7 @@ CREATE TABLE [dbo].[Employee](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[RequestForLeave]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[RequestForLeave]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -136,7 +136,7 @@ CREATE TABLE [dbo].[RequestForLeave](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  View [dbo].[vw_RequestDetails]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  View [dbo].[vw_RequestDetails]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -177,7 +177,7 @@ INNER JOIN Division d ON e.did = d.did
 LEFT JOIN Employee s ON e.supervisorid = s.eid
 LEFT JOIN Employee p ON r.processed_by = p.eid;
 GO
-/****** Object:  Table [dbo].[Enrollment]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[Enrollment]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -193,7 +193,7 @@ CREATE TABLE [dbo].[Enrollment](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Feature]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[Feature]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -207,7 +207,7 @@ CREATE TABLE [dbo].[Feature](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Role]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[Role]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -221,7 +221,7 @@ CREATE TABLE [dbo].[Role](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[RoleFeature]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[RoleFeature]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -236,7 +236,7 @@ CREATE TABLE [dbo].[RoleFeature](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[User]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[User]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -246,13 +246,18 @@ CREATE TABLE [dbo].[User](
 	[username] [varchar](150) NOT NULL,
 	[password] [varchar](150) NOT NULL,
 	[displayname] [varchar](150) NOT NULL,
+	[login_fail_count] [int] NOT NULL,
+	[lock_until] [datetime] NULL,
+	[email] [nvarchar](255) NULL,
+	[otp] [varchar](10) NULL,
+	[otp_expire] [datetime] NULL,
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
 (
 	[uid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserRole]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Table [dbo].[UserRole]    Script Date: 11/9/2025 7:05:00 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -333,11 +338,14 @@ INSERT [dbo].[Feature] ([fid], [url]) VALUES (3, N'/request/list')
 GO
 INSERT [dbo].[Feature] ([fid], [url]) VALUES (4, N'/division/agenda')
 GO
+INSERT [dbo].[Feature] ([fid], [url]) VALUES (5, N'/admin/dashboard')
+GO
+INSERT [dbo].[Feature] ([fid], [url]) VALUES (6, N'/admin/userlist')
+GO
 SET IDENTITY_INSERT [dbo].[RequestForLeave] ON 
 GO
-INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (1, 2, CAST(N'2025-10-25T21:02:17.730' AS DateTime), CAST(N'2025-10-15' AS Date), CAST(N'2025-09-29' AS Date), N'Sick', 1, NULL, NULL, NULL)
-GO
-INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (2, 2, CAST(N'2025-10-25T21:02:31.833' AS DateTime), CAST(N'2025-10-15' AS Date), CAST(N'2025-10-30' AS Date), N'Sick', 1, NULL, NULL, NULL)
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (2, 2, CAST(N'2025-10-25T21:02:31.833' AS DateTime), CAST(N'2025-10-15' AS Date), CAST(N'2025-10-30' AS Date), N've tham nguoi nha
+', 1, NULL, NULL, NULL)
 GO
 INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (3, 2, CAST(N'2025-10-25T21:02:53.387' AS DateTime), CAST(N'2025-10-25' AS Date), CAST(N'2025-10-27' AS Date), N'sick', 3, 1, N'di vien nhe', CAST(N'2025-10-27T14:47:54.897' AS DateTime))
 GO
@@ -348,7 +356,7 @@ INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to
 GO
 INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (6, 4, CAST(N'2025-10-25T21:15:30.717' AS DateTime), CAST(N'2025-10-24' AS Date), CAST(N'2025-10-30' AS Date), N's', 3, 2, N'test', CAST(N'2025-10-28T19:42:46.080' AS DateTime))
 GO
-INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (7, 3, CAST(N'2025-10-25T21:29:18.187' AS DateTime), CAST(N'2025-10-25' AS Date), CAST(N'2025-10-26' AS Date), N's', 1, NULL, NULL, NULL)
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (7, 3, CAST(N'2025-10-25T21:29:18.187' AS DateTime), CAST(N'2025-10-25' AS Date), CAST(N'2025-10-26' AS Date), N's', 3, 1, N'che', CAST(N'2025-10-29T22:51:31.087' AS DateTime))
 GO
 INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (8, 4, CAST(N'2025-10-25T21:31:24.667' AS DateTime), CAST(N'2025-10-25' AS Date), CAST(N'2025-10-26' AS Date), N'a', 2, 2, N'APPROVE', NULL)
 GO
@@ -364,10 +372,30 @@ INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to
 GO
 INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (14, 7, CAST(N'2025-10-27T00:30:27.980' AS DateTime), CAST(N'2025-10-15' AS Date), CAST(N'2025-10-28' AS Date), N'kkk', 1, NULL, NULL, NULL)
 GO
-INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (15, 2, CAST(N'2025-10-27T23:10:09.187' AS DateTime), CAST(N'2025-10-27' AS Date), CAST(N'2025-10-20' AS Date), N'Deny', 1, NULL, NULL, NULL)
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (15, 2, CAST(N'2025-10-27T23:10:09.187' AS DateTime), CAST(N'2025-11-07' AS Date), CAST(N'2025-11-13' AS Date), N'Deny', 1, NULL, NULL, NULL)
 GO
 INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (17, 3, CAST(N'2025-10-28T21:41:59.793' AS DateTime), CAST(N'2025-10-30' AS Date), CAST(N'2025-10-31' AS Date), N'on thi pe
-', 1, NULL, NULL, NULL)
+', 3, 1, N'khong can on', CAST(N'2025-11-05T14:12:35.710' AS DateTime))
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (18, 8, CAST(N'2025-10-30T00:42:42.110' AS DateTime), CAST(N'2025-10-31' AS Date), CAST(N'2025-11-01' AS Date), N'thi pe', 1, NULL, NULL, NULL)
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (19, 8, CAST(N'2025-10-30T00:44:27.480' AS DateTime), CAST(N'2025-10-30' AS Date), CAST(N'2025-10-30' AS Date), N've nha', 1, NULL, NULL, NULL)
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (21, 4, CAST(N'2025-11-01T23:33:39.310' AS DateTime), CAST(N'2025-11-22' AS Date), CAST(N'2025-11-29' AS Date), N'nghi demo', 2, 1, N'domo on roi ', CAST(N'2025-11-02T21:08:17.570' AS DateTime))
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (23, 10, CAST(N'2025-11-02T00:52:48.843' AS DateTime), CAST(N'2025-11-02' AS Date), CAST(N'2025-11-05' AS Date), N'hello', 2, NULL, NULL, NULL)
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (24, 1, CAST(N'2025-11-02T00:55:09.967' AS DateTime), CAST(N'2025-11-02' AS Date), CAST(N'2025-11-05' AS Date), N'toi di cong tac ', 2, NULL, NULL, NULL)
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (25, 3, CAST(N'2025-11-05T13:54:58.017' AS DateTime), CAST(N'2025-11-06' AS Date), CAST(N'2025-11-08' AS Date), N'nghi on thi pe prj', 3, 1, N'khong dong y', CAST(N'2025-11-05T14:01:23.387' AS DateTime))
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (26, 4, CAST(N'2025-11-05T13:55:28.967' AS DateTime), CAST(N'2025-11-05' AS Date), CAST(N'2025-11-11' AS Date), N'tai nan giao thong', 2, 1, N'duong benh nhe', CAST(N'2025-11-05T13:56:20.870' AS DateTime))
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (27, 10, CAST(N'2025-11-06T14:19:25.203' AS DateTime), CAST(N'2025-11-06' AS Date), CAST(N'2025-11-07' AS Date), N'di pr san pham', 2, NULL, NULL, NULL)
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (28, 11, CAST(N'2025-11-06T14:21:02.150' AS DateTime), CAST(N'2025-11-06' AS Date), CAST(N'2025-11-07' AS Date), N'nay em di trong cua hang', 1, NULL, NULL, NULL)
+GO
+INSERT [dbo].[RequestForLeave] ([rid], [created_by], [created_time], [from], [to], [reason], [status], [processed_by], [process_reason], [processed_time]) VALUES (29, 7, CAST(N'2025-11-07T22:50:07.477' AS DateTime), CAST(N'2025-11-07' AS Date), CAST(N'2025-11-16' AS Date), N'on thi pe va lam project prj', 1, NULL, NULL, NULL)
 GO
 SET IDENTITY_INSERT [dbo].[RequestForLeave] OFF
 GO
@@ -388,6 +416,8 @@ GO
 INSERT [dbo].[Role] ([rid], [rname]) VALUES (8, N'Sale PM')
 GO
 INSERT [dbo].[Role] ([rid], [rname]) VALUES (9, N'Sale Employee')
+GO
+INSERT [dbo].[Role] ([rid], [rname]) VALUES (10, N'Admin')
 GO
 INSERT [dbo].[RoleFeature] ([rid], [fid]) VALUES (1, 1)
 GO
@@ -445,31 +475,37 @@ INSERT [dbo].[RoleFeature] ([rid], [fid]) VALUES (9, 3)
 GO
 INSERT [dbo].[RoleFeature] ([rid], [fid]) VALUES (9, 4)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (1, N'mra', N'123', N'Mr A - IT Division Leader')
+INSERT [dbo].[RoleFeature] ([rid], [fid]) VALUES (10, 5)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (2, N'mrb', N'123', N'Mr B - IT Project Manager')
+INSERT [dbo].[RoleFeature] ([rid], [fid]) VALUES (10, 6)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (3, N'mrc', N'123', N'Mr C - IT Project Manager')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (1, N'mra', N'8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', N'Mr A - IT Division Leader', 0, NULL, N'hhooaannggdduucc@gmail.com', N'420748', CAST(N'2025-11-09T19:05:54.993' AS DateTime))
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (4, N'mrd', N'123', N'IT Employee MrD')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (2, N'mrb', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Mr B - IT Project Manager', 0, CAST(N'2025-11-06T14:16:38.200' AS DateTime), NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (5, N'mre', N'123', N'IT Employee MrE')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (3, N'mrc', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Mr C - IT Project Manager', 1, CAST(N'2025-11-06T14:40:51.750' AS DateTime), NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (6, N'mrg', N'123', N'Mr G -QA Division Leader')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (4, N'mrd', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'IT Employee MrD', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (7, N'mrduc', N'123', N'QA Employee Mr Hoang Duc')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (5, N'mre', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'IT Employee MrE', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (8, N'mrmanh', N'123', N'QA Employee Mr Manh')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (6, N'mrg', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Mr G -QA Division Leader', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (9, N'mrthang', N'123', N'Mr Thang - QA Project Manager')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (7, N'mrduc', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'QA Employee Mr Hoang Duc', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (10, N'mrvinh', N'123', N'Mr Vinh - Sale Division Leader')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (8, N'mrmanh', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'QA Employee Mr Manh', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (11, N'mrviet', N'123', N'Mr Viet - Sale Project Manager')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (9, N'mrthang', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Mr Thang - QA Project Manager', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (12, N'mrnguyen', N'123', N'Sale Employee Mr Nguyen')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (10, N'mrvinh', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Mr Vinh - Sale Division Leader', 0, NULL, NULL, NULL, NULL)
 GO
-INSERT [dbo].[User] ([uid], [username], [password], [displayname]) VALUES (13, N'mrha', N'123', N'Sale Employee Mr Ha')
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (11, N'mrviet', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Mr Viet - Sale Project Manager', 0, NULL, NULL, NULL, NULL)
+GO
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (12, N'mrnguyen', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Sale Employee Mr Nguyen', 0, NULL, NULL, NULL, NULL)
+GO
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (13, N'mrha', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', N'Sale Employee Mr Ha', 0, NULL, NULL, NULL, NULL)
+GO
+INSERT [dbo].[User] ([uid], [username], [password], [displayname], [login_fail_count], [lock_until], [email], [otp], [otp_expire]) VALUES (14, N'admin', N'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', N'System Administrator', 0, NULL, N'minhduchoang2410@gmail.com', NULL, NULL)
 GO
 INSERT [dbo].[UserRole] ([uid], [rid]) VALUES (1, 1)
 GO
@@ -497,23 +533,27 @@ INSERT [dbo].[UserRole] ([uid], [rid]) VALUES (12, 9)
 GO
 INSERT [dbo].[UserRole] ([uid], [rid]) VALUES (13, 9)
 GO
-/****** Object:  Index [IX_Request_CreatedBy]    Script Date: 10/29/2025 10:42:31 PM ******/
+INSERT [dbo].[UserRole] ([uid], [rid]) VALUES (14, 10)
+GO
+/****** Object:  Index [IX_Request_CreatedBy]    Script Date: 11/9/2025 7:05:00 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Request_CreatedBy] ON [dbo].[RequestForLeave]
 (
 	[created_by] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Request_ProcessedBy]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Index [IX_Request_ProcessedBy]    Script Date: 11/9/2025 7:05:00 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Request_ProcessedBy] ON [dbo].[RequestForLeave]
 (
 	[processed_by] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Request_Status]    Script Date: 10/29/2025 10:42:31 PM ******/
+/****** Object:  Index [IX_Request_Status]    Script Date: 11/9/2025 7:05:00 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Request_Status] ON [dbo].[RequestForLeave]
 (
 	[status] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[User] ADD  DEFAULT ((0)) FOR [login_fail_count]
 GO
 ALTER TABLE [dbo].[Employee]  WITH CHECK ADD  CONSTRAINT [FK_Employee_Division] FOREIGN KEY([did])
 REFERENCES [dbo].[Division] ([did])
