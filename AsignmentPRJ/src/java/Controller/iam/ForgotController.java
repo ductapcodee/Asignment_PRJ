@@ -32,7 +32,7 @@ public class ForgotController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         try {
-            String email = req.getParameter("email");
+            String email = req.getParameter("email").trim();
             
             UserDBContext db = new UserDBContext();
             var user = db.findByEmail(email);
