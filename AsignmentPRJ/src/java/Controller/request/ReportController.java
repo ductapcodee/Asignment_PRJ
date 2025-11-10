@@ -34,56 +34,108 @@ public class ReportController extends BaseRequiredAuthenticationController {
         RequestDBContext db = new RequestDBContext();
         ArrayList<RequestForLeave> requests = getRequestsByRole(db, user);
 
-        // ===== Filter Date =====
-        if ((fromDate != null && !fromDate.isEmpty()) && (toDate != null && !toDate.isEmpty())) {
-            LocalDate from = LocalDate.parse(fromDate);
-            LocalDate to = LocalDate.parse(toDate);
+        // ✅ 2. Filter Date
+        boolean hasDateFilter = false;
+        if (fromDate != null && !fromDate.trim().isEmpty()
+                && toDate != null && !toDate.trim().isEmpty()) {
 
-            if (from.isAfter(to)) {
-                req.setAttribute("error", "❌ 'From Date' cannot be later than 'To Date'.");
-                req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
-                return;
+            try {
+                LocalDate from = LocalDate.parse(fromDate.trim());
+                LocalDate to = LocalDate.parse(toDate.trim());
+
+                if (from.isAfter(to)) {
+                    req.setAttribute("error", "❌ 'From Date' cannot be later than 'To Date'.");
+                    req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
+                    return;
+                }
+
+                requests = filterByDateRange(requests, fromDate.trim(), toDate.trim());
+                hasDateFilter = true;
+                System.out.println("After date filter: " + requests.size());
+            } catch (Exception e) {
+                System.out.println("Date parse error: " + e.getMessage());
             }
-
-            requests = filterByDateRange(requests, fromDate, toDate);
         }
 
-        // ===== Filter Status =====
-        if (status != null && !status.equals("all")) {
-            requests = filterByStatus(requests, Integer.parseInt(status));
+        // ✅ 3. Filter Status - SỬA LẠI ĐIỀU KIỆN
+        if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
+            try {
+                int statusValue = Integer.parseInt(status.trim());
+                System.out.println("Filtering by status: " + statusValue); // DEBUG
+                requests = filterByStatus(requests, statusValue);
+                System.out.println("After status filter, size: " + requests.size()); // DEBUG
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid status value: " + status);
+            }
         }
 
-        // ===== Export =====
+        // ✅ 4. Export (nếu có)
         if ("excel".equals(format)) {
             exportToExcel(resp, requests);
-            return; // ✅ STOP here, không chạy xuống phân trang
+            return;
         }
 
-        // ===== Pagination =====
+        // ✅✅✅ 5. TÍNH SUMMARY TRÊN REQUESTS ĐÃ FILTER ✅✅✅
+        int totalRequests = requests.size();
+        int totalDays = 0;
+        int approvedCount = 0;
+        int pendingCount = 0;
+        int rejectedCount = 0;
+
+        // Duyệt qua danh sách ĐÃ FILTER để tính toán
+        for (RequestForLeave r : requests) {
+            long days = r.getTo().toLocalDate().toEpochDay()
+                    - r.getFrom().toLocalDate().toEpochDay() + 1;
+            totalDays += days;
+
+            if (r.getStatus() == 1) {
+                pendingCount++;
+            } else if (r.getStatus() == 2) {
+                approvedCount++;
+            } else if (r.getStatus() == 3) {
+                rejectedCount++;
+            }
+        }
+
+        // ✅ 6. Pagination
         int pagesize = 7;
         int totalRecords = requests.size();
-        int totalPages = (totalRecords + pagesize - 1) / pagesize;
+        int totalPages = totalRecords > 0 ? (totalRecords + pagesize - 1) / pagesize : 0;
+
         String page_raw = req.getParameter("page");
         int pageindex = 1;
         try {
             if (page_raw != null && !page_raw.isEmpty()) {
-                pageindex = Integer.parseInt(page_raw.trim());  // ✅ trim tránh lỗi
+                pageindex = Integer.parseInt(page_raw.trim());
             }
         } catch (Exception e) {
-            pageindex = 1;  // fallback
+            pageindex = 1;
         }
 
-        pageindex = Math.max(1, Math.min(pageindex, totalPages));
+        // Đảm bảo pageindex hợp lệ
+        if (totalPages > 0) {
+            pageindex = Math.max(1, Math.min(pageindex, totalPages));
+        }
 
-        int fromIndex = (pageindex - 1) * pagesize;
-        int toIndex = Math.min(fromIndex + pagesize, totalRecords);
+        // Tạo danh sách phân trang
+        ArrayList<RequestForLeave> pageList = new ArrayList<>();
+        if (totalRecords > 0) {
+            int fromIndex = (pageindex - 1) * pagesize;
+            int toIndex = Math.min(fromIndex + pagesize, totalRecords);
+            pageList = new ArrayList<>(requests.subList(fromIndex, toIndex));
+        }
 
-        ArrayList<RequestForLeave> pageList = new ArrayList<>(requests.subList(fromIndex, toIndex));
-
-        // ===== Send to JSP =====
-        req.setAttribute("requests", pageList);
+        // ✅ 7. Send to JSP
+        req.setAttribute("requests", pageList);           // Data phân trang
         req.setAttribute("pageindex", pageindex);
         req.setAttribute("totalPages", totalPages);
+
+        // ✅ Summary data từ danh sách ĐÃ FILTER
+        req.setAttribute("totalRequests", totalRequests);
+        req.setAttribute("totalDays", totalDays);
+        req.setAttribute("approvedCount", approvedCount);
+        req.setAttribute("pendingCount", pendingCount);
+        req.setAttribute("rejectedCount", rejectedCount);
 
         req.getRequestDispatcher("../view/request/report.jsp").forward(req, resp);
     }

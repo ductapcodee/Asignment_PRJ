@@ -1,9 +1,3 @@
-<%-- 
-    Document   : report
-    Created on : Nov 1, 2025, 11:06:39 PM
-    Author     : ADMIN
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -13,6 +7,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Leave Report Generator</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
             * {
                 margin: 0;
@@ -20,53 +15,222 @@
                 box-sizing: border-box;
             }
 
+            :root {
+                --primary-color: #2563eb;
+                --primary-dark: #1e40af;
+                --secondary-color: #0ea5e9;
+                --success-color: #10b981;
+                --warning-color: #f59e0b;
+                --danger-color: #ef4444;
+                --purple-color: #8b5cf6;
+                --gray-50: #f9fafb;
+                --gray-100: #f3f4f6;
+                --gray-200: #e5e7eb;
+                --gray-300: #d1d5db;
+                --gray-600: #4b5563;
+                --gray-700: #374151;
+                --gray-900: #111827;
+            }
+
             body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: var(--gray-50);
+                color: var(--gray-900);
+                line-height: 1.6;
                 min-height: 100vh;
-                padding: 20px;
             }
 
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-
-            .header {
+            /* Top Navigation */
+            .top-nav {
                 background: white;
-                padding: 30px;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                margin-bottom: 30px;
+                border-bottom: 1px solid var(--gray-200);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
 
-            .header h1 {
-                color: #2c3e50;
-                font-size: 32px;
-                margin-bottom: 10px;
+            .nav-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 64px;
             }
 
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--gray-900);
+            }
+
+            .nav-brand-icon {
+                width: 36px;
+                height: 36px;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 18px;
+            }
+
+            .btn-home {
+                padding: 9px 20px;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                border: none;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .btn-home:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            }
+
+            /* Main Container */
+            .main-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 32px 24px;
+            }
+
+            /* Page Header */
+            .page-header {
+                background: white;
+                border-radius: 16px;
+                padding: 32px;
+                margin-bottom: 32px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border: 1px solid var(--gray-200);
+                animation: fadeInUp 0.4s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .page-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--gray-900);
+                margin-bottom: 8px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+                color: var(--gray-600);
+            }
+
+            /* Alert */
+            .alert {
+                padding: 16px 20px;
+                border-radius: 12px;
+                margin-bottom: 24px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+                font-size: 14px;
+                background: #fee2e2;
+                color: #991b1b;
+                border-left: 4px solid var(--danger-color);
+                animation: slideDown 0.3s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Filter Card */
             .filter-card {
                 background: white;
-                padding: 30px;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                margin-bottom: 30px;
+                border: 1px solid var(--gray-200);
+                border-radius: 12px;
+                padding: 24px;
+                margin-bottom: 24px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                animation: fadeInUp 0.5s ease-out;
             }
 
-            .filter-card h2 {
-                color: #2c3e50;
-                font-size: 24px;
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
                 margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 3px solid #ecf0f1;
+                padding-bottom: 12px;
+                border-bottom: 2px solid var(--gray-200);
             }
 
+            .section-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: var(--gray-900);
+            }
+
+            /* Tab Buttons */
+            .tab-buttons {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+
+            .tab-btn {
+                padding: 10px 20px;
+                border: 2px solid var(--gray-300);
+                background: white;
+                color: var(--gray-700);
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-size: 14px;
+            }
+
+            .tab-btn:hover {
+                border-color: var(--primary-color);
+                color: var(--primary-color);
+            }
+
+            .tab-btn.active {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                border-color: transparent;
+            }
+
+            /* Filter Grid */
             .filter-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                 gap: 20px;
-                margin-bottom: 25px;
+                margin-bottom: 20px;
             }
 
             .filter-group {
@@ -76,112 +240,109 @@
 
             .filter-group label {
                 font-weight: 600;
-                color: #2c3e50;
+                color: var(--gray-700);
                 margin-bottom: 8px;
                 font-size: 14px;
             }
 
             .filter-group input,
             .filter-group select {
-                padding: 12px;
-                border: 2px solid #ecf0f1;
+                padding: 10px 12px;
+                border: 1px solid var(--gray-300);
                 border-radius: 8px;
                 font-size: 14px;
-                transition: all 0.3s ease;
+                transition: all 0.2s ease;
             }
 
             .filter-group input:focus,
             .filter-group select:focus {
                 outline: none;
-                border-color: #3498db;
-                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
             }
 
+            .current-filter {
+                padding: 12px 16px;
+                background: var(--gray-100);
+                border-radius: 8px;
+                font-size: 14px;
+                color: var(--gray-700);
+                font-style: italic;
+                margin-bottom: 16px;
+            }
+
+            /* Action Buttons */
             .action-buttons {
                 display: flex;
-                gap: 15px;
+                gap: 12px;
                 flex-wrap: wrap;
             }
 
             .btn {
-                padding: 12px 24px;
+                padding: 10px 20px;
                 border: none;
                 border-radius: 8px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                font-size: 14px;
+                transition: all 0.2s ease;
                 display: inline-flex;
                 align-items: center;
-                gap: 8px;
+                gap: 6px;
                 text-decoration: none;
             }
 
             .btn-primary {
-                background: #3498db;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
                 color: white;
             }
 
             .btn-primary:hover {
-                background: #2980b9;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
             }
 
             .btn-success {
-                background: #27ae60;
+                background: var(--success-color);
                 color: white;
             }
 
             .btn-success:hover {
-                background: #229954;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+                background: #059669;
+                transform: translateY(-1px);
             }
 
             .btn-warning {
-                background: #f39c12;
+                background: var(--warning-color);
                 color: white;
             }
 
             .btn-warning:hover {
-                background: #e67e22;
-                transform: translateY(-2px);
+                background: #d97706;
+                transform: translateY(-1px);
             }
 
-            .results-card {
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            }
-
-            .results-card h2 {
-                color: #2c3e50;
-                font-size: 24px;
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 3px solid #ecf0f1;
-            }
-
+            /* Summary Stats */
             .summary-stats {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 20px;
-                margin-bottom: 30px;
+                margin-bottom: 24px;
             }
 
             .stat-box {
                 padding: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
                 border-radius: 12px;
                 color: white;
                 text-align: center;
             }
 
             .stat-box .label {
-                font-size: 14px;
+                font-size: 13px;
                 opacity: 0.9;
                 margin-bottom: 8px;
+                font-weight: 500;
             }
 
             .stat-box .value {
@@ -189,6 +350,7 @@
                 font-weight: 700;
             }
 
+            /* Data Table */
             .data-table {
                 width: 100%;
                 border-collapse: collapse;
@@ -196,44 +358,157 @@
             }
 
             .data-table thead {
-                background: #34495e;
-                color: white;
+                background: var(--gray-100);
             }
 
-            .data-table th,
-            .data-table td {
-                padding: 12px;
+            .data-table th {
+                padding: 12px 16px;
                 text-align: left;
-                border-bottom: 1px solid #ecf0f1;
+                font-weight: 600;
+                font-size: 13px;
+                color: var(--gray-700);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-bottom: 2px solid var(--gray-200);
+            }
+
+            .data-table tbody tr {
+                border-bottom: 1px solid var(--gray-200);
+                transition: all 0.2s ease;
             }
 
             .data-table tbody tr:hover {
-                background: #f8f9fa;
+                background: var(--gray-50);
+            }
+
+            .data-table td {
+                padding: 14px 16px;
+                font-size: 14px;
+                color: var(--gray-700);
             }
 
             .status-badge {
+                display: inline-block;
                 padding: 4px 12px;
-                border-radius: 20px;
+                border-radius: 6px;
                 font-size: 12px;
                 font-weight: 600;
             }
 
             .status-pending {
-                background: #f39c12;
-                color: white;
+                background: #fef3c7;
+                color: #92400e;
             }
 
             .status-approved {
-                background: #27ae60;
-                color: white;
+                background: #d1fae5;
+                color: #065f46;
             }
 
             .status-rejected {
-                background: #e74c3c;
-                color: white;
+                background: #fee2e2;
+                color: #991b1b;
             }
 
+            /* Pagination */
+            .pagination {
+                margin-top: 24px;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .pagination a,
+            .pagination span {
+                padding: 8px 14px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+
+            .pagination a {
+                color: var(--primary-color);
+                background: white;
+                border: 1px solid var(--gray-300);
+            }
+
+            .pagination a:hover {
+                background: var(--gray-100);
+                border-color: var(--primary-color);
+            }
+
+            .pagination .current {
+                color: white;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                border: 1px solid transparent;
+            }
+
+            .pagination .ellipsis {
+                color: var(--gray-600);
+                border: none;
+            }
+
+            /* Print Styles */
+            @media print {
+                body {
+                    background: white;
+                    padding: 0;
+                }
+
+                .top-nav,
+                .tab-buttons,
+                #quickSection,
+                #customSection,
+                .current-filter,
+                .btn-success,
+                .btn-warning {
+                    display: none !important;
+                }
+
+                .page-header,
+                .filter-card {
+                    box-shadow: none;
+                    border: 1px solid #ccc;
+                }
+
+                .data-table th,
+                .data-table td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    font-size: 12px;
+                }
+
+                .stat-box {
+                    background: #eee !important;
+                    color: #000 !important;
+                }
+            }
+
+            /* Responsive */
             @media (max-width: 768px) {
+                .nav-container {
+                    height: auto;
+                    padding: 16px;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .main-container {
+                    padding: 20px 16px;
+                }
+
+                .page-header {
+                    padding: 24px 20px;
+                }
+
+                .page-title {
+                    font-size: 22px;
+                }
+
                 .filter-grid {
                     grid-template-columns: 1fr;
                 }
@@ -246,186 +521,83 @@
                     width: 100%;
                     justify-content: center;
                 }
-            }
-            .error-message {
-                background-color: #e74c3c;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                font-weight: 600;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                animation: fadeIn 0.4s ease;
-            }
 
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(-5px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
+                .summary-stats {
+                    grid-template-columns: 1fr;
                 }
             }
-            /* === PRINT VIEW IMPROVEMENTS === */
-            @media print {
-                body {
-                    background: white !important;
-                    padding: 0;
-                    color: #000;
-                }
-
-                .header, .filter-card, .results-card {
-                    box-shadow: none !important;
-                }
-
-                .header h1 {
-                    text-align: center;
-                    color: #000;
-                }
-
-                /* Ẩn phần không cần in */
-                #tabQuick,
-                #tabCustom,
-                #quickSection,
-                #currentFilter {
-                    display: none !important;
-                }
-
-                /* Giữ lại phần form gọn gàng */
-                .filter-card {
-                    border: 1px solid #ccc;
-                    margin-bottom: 20px;
-                    padding: 15px;
-                }
-
-                /* Nút hành động */
-                .action-buttons {
-                    display: flex;
-                    justify-content: center;
-                    gap: 20px;
-                    margin-top: 15px;
-                }
-
-                .btn {
-                    background: #f2f2f2 !important;
-                    color: #000 !important;
-                    border: 1px solid #ccc !important;
-                    box-shadow: none !important;
-                    font-size: 13px;
-                    padding: 8px 14px;
-                    text-transform: uppercase;
-                }
-
-                /* Bảng dữ liệu */
-                .data-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 15px;
-                }
-
-                .data-table th,
-                .data-table td {
-                    border: 1px solid #ccc;
-                    padding: 8px;
-                    font-size: 13px;
-                }
-
-                .data-table thead {
-                    background: #eee !important;
-                    color: #000 !important;
-                }
-
-                /* Ẩn phần nền gradient */
-                .stat-box {
-                    background: #eee !important;
-                    color: #000 !important;
-                }
-
-                /* Ẩn phần không cần khi in (VD: Reset Filter, Export Excel) */
-                button.btn-success,
-                button.btn-warning {
-                    display: none !important;
-                }
-            }
-            .btn-primary-home {
-                background: linear-gradient(135deg, #6a5af9 0%, #836fff 100%);
-                color: white;
-                padding: 10px 22px;
-                border-radius: 999px; /* bo tròn đẹp */
-                border: none;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 600;
-                text-decoration: none;
-                box-shadow: 0 3px 8px rgba(106, 90, 249, 0.3);
-                transition: 0.25s ease;
-                display: inline-block;
-            }
-
-            /* Hover: sáng hơn + nổi lên */
-            .btn-primary-home:hover {
-                background: linear-gradient(135deg, #7c6cfa 0%, #9a82ff 100%);
-                transform: translateY(-2px);
-                box-shadow: 0 7px 18px rgba(106, 90, 249, 0.45);
-            }
-
         </style>
     </head>
     <body>
-        <div class="container">
-            <!-- Header -->
-            <div class="header">
-                <h1>📊 Leave Report Generator</h1>
-                <p style="color: #7f8c8d; margin-top: 10px;">
-                    Generate comprehensive leave reports with custom filters
-                </p>
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                    <a href="${pageContext.request.contextPath}/home" class="btn-primary-home">
-                        Về Trang Chủ
-                    </a>
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <div class="nav-brand-icon">📈</div>
+                    <span>Leave Report Generator</span>
                 </div>
+                <a href="${pageContext.request.contextPath}/home" class="btn-home">
+                    <span>🏠</span> Về Trang Chủ
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">📈 Leave Report Generator</div>
+                <div class="page-subtitle">Tạo báo cáo chi tiết về nghỉ phép với các bộ lọc tùy chỉnh</div>
             </div>
 
+            <!-- Error Alert -->
+            <c:if test="${not empty error}">
+                <div class="alert">
+                    <span style="font-size: 20px;">⚠️</span>
+                    <span>${error}</span>
+                </div>
+            </c:if>
 
             <!-- Filter Form -->
             <div class="filter-card">
-                <h2>🔍 Filter Options</h2>
-                <c:if test="${not empty error}">
-                    <div class="error-message">${error}</div>
-                </c:if>
+                <div class="section-header">
+                    <span style="font-size: 24px;">🔍</span>
+                    <h2 class="section-title">Tùy chọn tìm kiếm</h2>
+                </div>
 
                 <form action="${pageContext.request.contextPath}/request/report" method="get" id="reportForm">
-
                     <!-- Tabs -->
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button type="button" id="tabQuick" class="btn btn-primary" onclick="switchMode('quick')">Quick Range</button>
-                        <button type="button" id="tabCustom" class="btn btn-warning" onclick="switchMode('custom')">Custom Range</button>
+                    <div class="tab-buttons">
+                        <button type="button" id="tabQuick" class="tab-btn" onclick="switchMode('quick')">
+                            ⚡ Tìm kiếm nhanh
+                        </button>
+                        <button type="button" id="tabCustom" class="tab-btn active" onclick="switchMode('custom')">
+                            🎯 Tùy chỉnh
+                        </button>
                     </div>
 
                     <!-- Quick Range Section -->
                     <div id="quickSection" style="display: none;">
                         <div class="filter-grid">
                             <div class="filter-group">
-                                <label>Quick Select</label>
+                                <label>Chọn khoảng thời gian</label>
                                 <select id="quickSelect" onchange="applyQuickFilter()">
-                                    <option value="">Select...</option>
-                                    <option value="today">Today</option>
-                                    <option value="week">This Week</option>
-                                    <option value="month">This Month</option>
-                                    <option value="quarter">This Quarter</option>
-                                    <option value="year">This Year</option>
+                                    <option value="">Chọn...</option>
+                                    <option value="today">Hôm nay</option>
+                                    <option value="week">Tuần này</option>
+                                    <option value="month">Tháng này</option>
+                                    <option value="quarter">Quý này</option>
+                                    <option value="year">Năm nay</option>
                                 </select>
                             </div>
 
                             <div class="filter-group">
-                                <label>Status</label>
+                                <label>Trạng thái</label>
                                 <select name="status" id="statusFilter">
-                                    <option value="all" ${param.status == 'all' ? 'selected' : ''}>All Status</option>
-                                    <option value="1" ${param.status == '1' ? 'selected' : ''}>Pending</option>
-                                    <option value="2" ${param.status == '2' ? 'selected' : ''}>Approved</option>
-                                    <option value="3" ${param.status == '3' ? 'selected' : ''}>Rejected</option>
+                                    <option value="all" ${param.status == 'all' ? 'selected' : ''}>Tất cả</option>
+                                    <option value="1" ${param.status == '1' ? 'selected' : ''}>Chờ duyệt</option>
+                                    <option value="2" ${param.status == '2' ? 'selected' : ''}>Đã duyệt</option>
+                                    <option value="3" ${param.status == '3' ? 'selected' : ''}>Từ chối</option>
                                 </select>
                             </div>
                         </div>
@@ -435,169 +607,71 @@
                     <div id="customSection">
                         <div class="filter-grid">
                             <div class="filter-group">
-                                <label>From Date</label>
-                                <input type="date" name="from" id="fromDate" value="${param.from}">
+                                <label>Từ ngày</label>
+                                <input type="date" name="from" id="fromDate" value="${param.from != null ? param.from : ''}">
                             </div>
                             <div class="filter-group">
-                                <label>To Date</label>
-                                <input type="date" name="to" id="toDate" value="${param.to}">
+                                <label>Đến ngày</label>
+                                <input type="date" name="to" id="toDate" value="${param.to != null ? param.to : ''}">
                             </div>
                             <div class="filter-group">
-                                <label>Status</label>
+                                <label>Trạng thái</label>
                                 <select name="status" id="statusFilterCustom">
-                                    <option value="all" ${param.status == 'all' ? 'selected' : ''}>All Status</option>
-                                    <option value="1" ${param.status == '1' ? 'selected' : ''}>Pending</option>
-                                    <option value="2" ${param.status == '2' ? 'selected' : ''}>Approved</option>
-                                    <option value="3" ${param.status == '3' ? 'selected' : ''}>Rejected</option>
+                                    <option value="all" ${param.status == null || param.status == 'all' || param.status == '' ? 'selected' : ''}>Tất cả</option>
+                                    <option value="1" ${param.status == '1' ? 'selected' : ''}>Chờ duyệt</option>
+                                    <option value="2" ${param.status == '2' ? 'selected' : ''}>Đã duyệt</option>
+                                    <option value="3" ${param.status == '3' ? 'selected' : ''}>Từ chối</option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <p id="currentFilter" style="margin-top: 10px; font-size: 14px; color: #555; font-style: italic;">
-                        📅 Currently applied: None
-                    </p>
+                    <div class="current-filter" id="currentFilter">
+                        📅 Bộ lọc hiện tại: Tùy chỉnh (chọn khoảng thời gian)
+                    </div>
 
-                    <div class="action-buttons" style="margin-top: 15px;">
+                    <div class="action-buttons">
                         <button type="submit" class="btn btn-primary">
-                            🔍 Generate Report
+                            🔍 Tìm báo cáo
                         </button>
                         <button type="button" class="btn btn-success" onclick="exportReport('excel')">
-                            📊 Export Excel
+                            📊 Xuất Excel
                         </button>
                         <button type="button" class="btn btn-warning" onclick="printReport()">
-                            🖨️ Print
+                            🖨️ In báo cáo
                         </button>
                         <button type="button" class="btn btn-warning" onclick="resetFilters()">
-                            ♻ Reset Filter
+                            ♻️ Đặt lại
                         </button>
-
                     </div>
                 </form>
             </div>
 
-            <script>
-                let mode = 'custom'; // default
-
-                function switchMode(selected) {
-                    mode = selected;
-                    const quick = document.getElementById('quickSection');
-                    const custom = document.getElementById('customSection');
-                    const tabQuick = document.getElementById('tabQuick');
-                    const tabCustom = document.getElementById('tabCustom');
-                    const quickSelect = document.getElementById('quickSelect');
-                    const currentFilter = document.getElementById('currentFilter');
-
-                    if (selected === 'quick') {
-                        quick.style.display = 'block';
-                        custom.style.display = 'none';
-                        tabQuick.classList.add('btn-success');
-                        tabCustom.classList.remove('btn-success');
-                        currentFilter.textContent = "📅 Currently applied: Quick Range (Choose option)";
-                        quickSelect.value = '';
-                    } else {
-                        quick.style.display = 'none';
-                        custom.style.display = 'block';
-                        tabCustom.classList.add('btn-success');
-                        tabQuick.classList.remove('btn-success');
-                        currentFilter.textContent = "📅 Currently applied: Custom Range (choose From–To)";
-                    }
-                }
-
-                function applyQuickFilter() {
-                    const select = document.getElementById('quickSelect');
-                    const fromDate = document.getElementById('fromDate');
-                    const toDate = document.getElementById('toDate');
-                    const currentFilter = document.getElementById('currentFilter');
-                    const today = new Date();
-                    let from, to, label;
-
-                    switch (select.value) {
-                        case 'today':
-                            from = to = today;
-                            label = 'Today';
-                            break;
-                        case 'week':
-                            const first = new Date(today.setDate(today.getDate() - today.getDay()));
-                            const last = new Date(first);
-                            last.setDate(first.getDate() + 6);
-                            from = first;
-                            to = last;
-                            label = 'This Week';
-                            break;
-                        case 'month':
-                            from = new Date(today.getFullYear(), today.getMonth(), 1);
-                            to = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                            label = 'This Month';
-                            break;
-                        case 'quarter':
-                            const q = Math.floor(today.getMonth() / 3);
-                            from = new Date(today.getFullYear(), q * 3, 1);
-                            to = new Date(today.getFullYear(), (q + 1) * 3, 0);
-                            label = 'This Quarter';
-                            break;
-                        case 'year':
-                            from = new Date(today.getFullYear(), 0, 1);
-                            to = new Date(today.getFullYear(), 11, 31);
-                            label = 'This Year';
-                            break;
-                        default:
-                            from = to = null;
-                            label = 'None';
-                    }
-
-                    if (from && to) {
-                        fromDate.valueAsDate = from;
-                        toDate.valueAsDate = to;
-                        currentFilter.textContent = `📅 Currently applied: ${label} (${from.toLocaleDateString()} → ${to.toLocaleDateString()})`;
-                    } else {
-                        currentFilter.textContent = "📅 Currently applied: None";
-                    }
-                }
-
-                // default view on load
-                switchMode('custom');
-                function resetFilters() {
-                    // Xóa tất cả các giá trị filter
-                    document.getElementById('fromDate').value = '';
-                    document.getElementById('toDate').value = '';
-                    document.getElementById('statusFilter').value = 'all';
-                    document.getElementById('statusFilterCustom').value = 'all';
-                    document.getElementById('quickSelect').value = '';
-                    document.getElementById('currentFilter').textContent = "📅 Currently applied: None";
-
-                    // Đặt lại chế độ về custom
-                    switchMode('custom');
-
-                    // ✅ Gửi form để load lại toàn bộ dữ liệu
-                    document.getElementById('reportForm').submit();
-                }
-
-            </script>
-
-
             <!-- Results -->
             <c:if test="${requests != null}">
-                <div class="results-card">
-                    <h2>📈 Report Results</h2>
+                <div class="filter-card">
+                    <div class="section-header">
+                        <span style="font-size: 24px;">📊</span>
+                        <h2 class="section-title">Kết quả báo cáo</h2>
+                    </div>
 
                     <!-- Summary Statistics -->
                     <div class="summary-stats">
                         <div class="stat-box">
-                            <div class="label">Total Requests</div>
-                            <div class="value">${requests.size()}</div>
+                            <div class="label">Tổng số đơn</div>
+                            <div class="value">${totalRequests != null ? totalRequests : 0}</div>
                         </div>
                         <div class="stat-box">
-                            <div class="label">Total Days</div>
-                            <div class="value" id="totalDays">0</div>
+                            <div class="label">Tổng số ngày</div>
+                            <div class="value">${totalDays != null ? totalDays : 0}</div>
                         </div>
                         <div class="stat-box">
-                            <div class="label">Approved</div>
-                            <div class="value" id="approvedCount">0</div>
+                            <div class="label">Đã duyệt</div>
+                            <div class="value">${approvedCount != null ? approvedCount : 0}</div>
                         </div>
                         <div class="stat-box">
-                            <div class="label">Pending</div>
-                            <div class="value" id="pendingCount">0</div>
+                            <div class="label">Chờ duyệt</div>
+                            <div class="value">${pendingCount != null ? pendingCount : 0}</div>
                         </div>
                     </div>
 
@@ -606,22 +680,22 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Employee</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Days</th>
-                                <th>Reason</th>
-                                <th>Status</th>
-                                <th>Processed By</th>
+                                <th>Nhân viên</th>
+                                <th>Từ ngày</th>
+                                <th>Đến ngày</th>
+                                <th>Số ngày</th>
+                                <th>Lý do</th>
+                                <th>Trạng thái</th>
+                                <th>Người duyệt</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach items="${requests}" var="req">
                                 <tr>
                                     <td>#${req.id}</td>
-                                    <td>${req.createdBy.name}</td>
-                                    <td><fmt:formatDate value="${req.from}" pattern="MM/dd/yyyy"/></td>
-                                    <td><fmt:formatDate value="${req.to}" pattern="MM/dd/yyyy"/></td>
+                                    <td><strong>${req.createdBy.name}</strong></td>
+                                    <td><fmt:formatDate value="${req.from}" pattern="dd/MM/yyyy"/></td>
+                                    <td><fmt:formatDate value="${req.to}" pattern="dd/MM/yyyy"/></td>
                                     <td>
                                         <jsp:useBean id="req" scope="page" type="model.RequestForLeave"/>
                                         <%
@@ -633,7 +707,7 @@
                                     <td>${req.reason}</td>
                                     <td>
                                         <span class="status-badge status-${req.status == 1 ? 'pending' : (req.status == 2 ? 'approved' : 'rejected')}">
-                                            ${req.status == 1 ? 'Pending' : (req.status == 2 ? 'Approved' : 'Rejected')}
+                                            ${req.status == 1 ? 'Chờ duyệt' : (req.status == 2 ? 'Đã duyệt' : 'Từ chối')}
                                         </span>
                                     </td>
                                     <td>${req.processedBy != null ? req.processedBy.name : 'N/A'}</td>
@@ -641,36 +715,30 @@
                             </c:forEach>
                         </tbody>
                     </table>
+
                     <!-- Pagination -->
                     <c:if test="${totalPages != null && totalPages > 0}">
-                        <div style="margin-top:20px; text-align:center;">
-
-                            <!-- Prev -->
+                        <div class="pagination">
                             <c:if test="${pageindex > 1}">
-                                <a href="${pageContext.request.contextPath}/request/report?page=${pageindex - 1}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
-                                   style="padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; background:white; border:1px solid #ddd; box-shadow:0 2px 6px rgba(0,0,0,0.15); color:#4f46e5; transition:0.2s;">
-                                    « Prev
+                                <a href="${pageContext.request.contextPath}/request/report?page=${pageindex - 1}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}">
+                                    ← Trước
                                 </a>
                             </c:if>
 
-                            <!-- compute start/end with window = 2 -->
                             <c:set var="window" value="2" />
                             <c:set var="start" value="${pageindex - window}" />
                             <c:set var="end" value="${pageindex + window}" />
 
-                            <!-- if start < 1, push end to right -->
                             <c:if test="${start < 1}">
                                 <c:set var="end" value="${end + (1 - start)}" />
                                 <c:set var="start" value="1" />
                             </c:if>
 
-                            <!-- if end > totalPages, push start to left -->
                             <c:if test="${end > totalPages}">
                                 <c:set var="start" value="${start - (end - totalPages)}" />
                                 <c:set var="end" value="${totalPages}" />
                             </c:if>
 
-                            <!-- final clamp to bounds -->
                             <c:if test="${start < 1}">
                                 <c:set var="start" value="1" />
                             </c:if>
@@ -678,118 +746,135 @@
                                 <c:set var="end" value="${totalPages}" />
                             </c:if>
 
-                            <!-- If there are pages before start, show first + ellipsis -->
                             <c:if test="${start > 1}">
-                                <a href="${pageContext.request.contextPath}/request/report?page=1&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
-                                   style="margin:0 4px; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; color:#4f46e5; background:white; border:1px solid #ddd;">
+                                <a href="${pageContext.request.contextPath}/request/report?page=1&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}">
                                     1
                                 </a>
-                                <span style="margin:0 6px; color:#9ca3af;">…</span>
+                                <span class="ellipsis">…</span>
                             </c:if>
 
-                            <!-- Page numbers from start to end -->
                             <c:forEach var="i" begin="${start}" end="${end}">
                                 <c:choose>
                                     <c:when test="${i == pageindex}">
-                                        <span style="margin:0 4px; padding:8px 14px; border-radius:8px; font-weight:600; color:white; background:linear-gradient(135deg,#6a5af9,#836fff); border:1px solid #ddd;">
-                                            ${i}
-                                        </span>
+                                        <span class="current">${i}</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <a href="${pageContext.request.contextPath}/request/report?page=${i}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
-                                           style="margin:0 4px; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; color:#4f46e5; background:white; border:1px solid #ddd;">
+                                        <a href="${pageContext.request.contextPath}/request/report?page=${i}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}">
                                             ${i}
                                         </a>
                                     </c:otherwise>
                                 </c:choose>
                             </c:forEach>
 
-                            <!-- If there are pages after end, show ellipsis + last -->
                             <c:if test="${end < totalPages}">
-                                <span style="margin:0 6px; color:#9ca3af;">…</span>
-                                <a href="${pageContext.request.contextPath}/request/report?page=${totalPages}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
-                                   style="margin:0 4px; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; color:#4f46e5; background:white; border:1px solid #ddd;">
+                                <span class="ellipsis">…</span>
+                                <a href="${pageContext.request.contextPath}/request/report?page=${totalPages}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}">
                                     ${totalPages}
                                 </a>
                             </c:if>
 
-                            <!-- Next -->
                             <c:if test="${pageindex < totalPages}">
-                                <a href="${pageContext.request.contextPath}/request/report?page=${pageindex + 1}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}"
-                                   style="padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; background:white; border:1px solid #ddd; box-shadow:0 2px 6px rgba(0,0,0,0.15); color:#4f46e5; transition:0.2s;">
-                                    Next »
+                                <a href="${pageContext.request.contextPath}/request/report?page=${pageindex + 1}&from=${param.from != null ? param.from : ''}&to=${param.to != null ? param.to : ''}&status=${param.status != null ? param.status : 'all'}">
+                                    Sau →
                                 </a>
                             </c:if>
-
                         </div>
                     </c:if>
-
-
-
                 </div>
             </c:if>
         </div>
 
         <script>
-            // Calculate summary stats
-            if (document.getElementById('totalDays')) {
-                let totalDays = 0;
-                let approved = 0;
-                let pending = 0;
+            let mode = 'custom';
 
-                document.querySelectorAll('#reportTable tbody tr').forEach(row => {
-                    const days = parseInt(row.cells[4].textContent);
-                    totalDays += days;
+            function switchMode(selected) {
+                mode = selected;
+                const quick = document.getElementById('quickSection');
+                const custom = document.getElementById('customSection');
+                const tabQuick = document.getElementById('tabQuick');
+                const tabCustom = document.getElementById('tabCustom');
+                const currentFilter = document.getElementById('currentFilter');
 
-                    const status = row.cells[6].textContent.trim();
-                    if (status === 'Approved')
-                        approved++;
-                    if (status === 'Pending')
-                        pending++;
-                });
-
-                document.getElementById('totalDays').textContent = totalDays;
-                document.getElementById('approvedCount').textContent = approved;
-                document.getElementById('pendingCount').textContent = pending;
+                if (selected === 'quick') {
+                    quick.style.display = 'block';
+                    custom.style.display = 'none';
+                    tabQuick.classList.add('active');
+                    tabCustom.classList.remove('active');
+                    currentFilter.textContent = "📅 Bộ lọc hiện tại: Lọc nhanh (chọn tùy chọn)";
+                } else {
+                    quick.style.display = 'none';
+                    custom.style.display = 'block';
+                    tabCustom.classList.add('active');
+                    tabQuick.classList.remove('active');
+                    currentFilter.textContent = "📅 Bộ lọc hiện tại: Tùy chỉnh (chọn khoảng thời gian)";
+                }
             }
 
-            // Quick filter presets
             function applyQuickFilter() {
                 const select = document.getElementById('quickSelect');
                 const fromDate = document.getElementById('fromDate');
                 const toDate = document.getElementById('toDate');
-
+                const currentFilter = document.getElementById('currentFilter');
                 const today = new Date();
-                let from, to;
+                let from, to, label;
 
                 switch (select.value) {
                     case 'today':
                         from = to = today;
+                        label = 'Hôm nay';
                         break;
                     case 'week':
-                        from = new Date(today.setDate(today.getDate() - today.getDay()));
-                        to = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+                        const first = new Date(today.setDate(today.getDate() - today.getDay()));
+                        const last = new Date(first);
+                        last.setDate(first.getDate() + 6);
+                        from = first;
+                        to = last;
+                        label = 'Tuần này';
                         break;
                     case 'month':
                         from = new Date(today.getFullYear(), today.getMonth(), 1);
                         to = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                        label = 'Tháng này';
                         break;
                     case 'quarter':
-                        const quarter = Math.floor(today.getMonth() / 3);
-                        from = new Date(today.getFullYear(), quarter * 3, 1);
-                        to = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                        const q = Math.floor(today.getMonth() / 3);
+                        from = new Date(today.getFullYear(), q * 3, 1);
+                        to = new Date(today.getFullYear(), (q + 1) * 3, 0);
+                        label = 'Quý này';
                         break;
                     case 'year':
                         from = new Date(today.getFullYear(), 0, 1);
                         to = new Date(today.getFullYear(), 11, 31);
+                        label = 'Năm nay';
                         break;
                     default:
-                        return;
+                        from = to = null;
+                        label = 'None';
                 }
 
-                fromDate.valueAsDate = from;
-                toDate.valueAsDate = to;
+                if (from && to) {
+                    fromDate.valueAsDate = from;
+                    toDate.valueAsDate = to;
+                    currentFilter.textContent = `📅 Bộ lọc hiện tại: ${label} (${from.toLocaleDateString()} → ${to.toLocaleDateString()})`;
+                } else {
+                    currentFilter.textContent = "📅 Bộ lọc hiện tại: None";
+                }
             }
+
+            // Default view on load
+            switchMode('custom');
+
+            function resetFilters() {
+                document.getElementById('fromDate').value = '';
+                document.getElementById('toDate').value = '';
+                document.getElementById('statusFilter').value = 'all';
+                document.getElementById('statusFilterCustom').value = 'all';
+                document.getElementById('quickSelect').value = '';
+                document.getElementById('currentFilter').textContent = "📅 Bộ lọc hiện tại: None";
+                switchMode('custom');
+                document.getElementById('reportForm').submit();
+            }
+
 
             // Export functions
             function exportReport(format) {
@@ -798,7 +883,12 @@
                 url.searchParams.set('format', format);
                 url.searchParams.set('from', document.getElementById('fromDate').value);
                 url.searchParams.set('to', document.getElementById('toDate').value);
-                url.searchParams.set('status', document.getElementById('statusFilter').value);
+
+                // Get correct status value based on active mode
+                const statusValue = mode === 'quick'
+                        ? document.getElementById('statusFilter').value
+                        : document.getElementById('statusFilterCustom').value;
+                url.searchParams.set('status', statusValue);
 
                 window.location.href = url.toString();
             }

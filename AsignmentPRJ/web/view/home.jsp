@@ -1,9 +1,3 @@
-<%-- 
-    Document   : home
-    Created on : Oct 23, 2025, 12:50:06 AM
-    Author     : ADMIN
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
@@ -11,260 +5,131 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard - Leave Request System</title>
-
-        <!-- Bootstrap 5 CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- Bootstrap Icons -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+        <title>Dashboard - Leave Management System</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
-            body {
-                font-family: 'Inter', sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                padding: 20px 0;
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
-            .dashboard-container {
+            :root {
+                --primary-color: #2563eb;
+                --primary-dark: #1e40af;
+                --secondary-color: #0ea5e9;
+                --success-color: #10b981;
+                --warning-color: #f59e0b;
+                --danger-color: #ef4444;
+                --purple-color: #8b5cf6;
+                --pink-color: #ec4899;
+                --gray-50: #f9fafb;
+                --gray-100: #f3f4f6;
+                --gray-200: #e5e7eb;
+                --gray-300: #d1d5db;
+                --gray-600: #4b5563;
+                --gray-700: #374151;
+                --gray-900: #111827;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: var(--gray-50);
+                color: var(--gray-900);
+                line-height: 1.6;
+                min-height: 100vh;
+            }
+
+            /* Top Navigation */
+            .top-nav {
+                background: white;
+                border-bottom: 1px solid var(--gray-200);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .nav-container {
                 max-width: 1400px;
                 margin: 0 auto;
-                padding: 0 15px;
+                padding: 0 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 64px;
+            }
+
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--gray-900);
+            }
+
+            .nav-brand-icon {
+                width: 36px;
+                height: 36px;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 18px;
+            }
+
+            .nav-actions {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .btn-logout {
+                padding: 9px 20px;
+                background: white;
+                color: var(--danger-color);
+                border: 2px solid var(--danger-color);
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .btn-logout:hover {
+                background: var(--danger-color);
+                color: white;
+                transform: translateY(-1px);
+            }
+
+            /* Main Container */
+            .main-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 32px 24px;
             }
 
             /* Welcome Card */
             .welcome-card {
                 background: white;
-                border-radius: 20px;
-                padding: 40px;
-                margin-bottom: 30px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-                position: relative;
-                overflow: hidden;
-            }
-
-            .welcome-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 5px;
-                background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            }
-
-            .welcome-title {
-                font-size: 32px;
-                font-weight: 700;
-                color: #1a202c;
-                margin-bottom: 10px;
-            }
-
-            .welcome-subtitle {
-                font-size: 18px;
-                color: #718096;
-                margin-bottom: 20px;
-            }
-
-            .role-badges {
-                display: flex;
-                gap: 10px;
-                flex-wrap: wrap;
-                margin-bottom: 20px;
-            }
-
-            .role-badge {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 8px 20px;
-                border-radius: 20px;
-                font-size: 14px;
-                font-weight: 600;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .role-badge.division-head {
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            }
-
-            /* Section Divider */
-            .section-divider {
-                background: white;
-                border-radius: 12px;
-                padding: 15px 25px;
-                margin: 30px 0 20px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            }
-
-            .section-title {
-                font-size: 20px;
-                font-weight: 700;
-                color: #1a202c;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .section-title .badge {
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                color: white;
-                padding: 4px 12px;
-                border-radius: 12px;
-                font-size: 11px;
-                font-weight: 700;
-            }
-
-            /* Action Cards */
-            .action-cards {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
-            }
-
-            .action-card {
-                background: white;
                 border-radius: 16px;
-                padding: 30px;
-                text-align: center;
-                transition: all 0.3s ease;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-                text-decoration: none;
-                color: inherit;
-                display: block;
-                position: relative;
-                overflow: hidden;
-                border: 2px solid transparent;
+                padding: 32px;
+                margin-bottom: 32px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border: 1px solid var(--gray-200);
+                animation: fadeInUp 0.4s ease-out;
             }
 
-            .action-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 100%;
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-
-            .action-card:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-                border-color: rgba(102, 126, 234, 0.3);
-            }
-
-            .action-card:hover::before {
-                opacity: 1;
-            }
-
-            .action-icon {
-                width: 80px;
-                height: 80px;
-                margin: 0 auto 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 20px;
-                font-size: 40px;
-                position: relative;
-                z-index: 1;
-            }
-
-            .action-card-primary .action-icon {
-                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                color: white;
-                box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-            }
-
-            .action-card-success .action-icon {
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                color: white;
-                box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-            }
-
-            .action-card-warning .action-icon {
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                color: white;
-                box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-            }
-
-            .action-card-info .action-icon {
-                background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-                color: white;
-                box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
-            }
-
-            .action-card-purple .action-icon {
-                background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                color: white;
-                box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
-            }
-
-            .action-card-pink .action-icon {
-                background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-                color: white;
-                box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
-            }
-
-            .action-title {
-                font-size: 20px;
-                font-weight: 700;
-                color: #1a202c;
-                margin-bottom: 10px;
-                position: relative;
-                z-index: 1;
-            }
-
-            .action-description {
-                font-size: 14px;
-                color: #718096;
-                position: relative;
-                z-index: 1;
-                line-height: 1.6;
-            }
-
-            /* Logout Button */
-            .logout-section {
-                text-align: center;
-                margin-top: 30px;
-            }
-
-            .btn-logout {
-                background: white;
-                color: #ef4444;
-                border: 2px solid #ef4444;
-                padding: 12px 30px;
-                border-radius: 12px;
-                font-weight: 600;
-                transition: all 0.3s ease;
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-                text-decoration: none;
-            }
-
-            .btn-logout:hover {
-                background: #ef4444;
-                color: white;
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-            }
-
-            /* Animations */
             @keyframes fadeInUp {
                 from {
                     opacity: 0;
-                    transform: translateY(30px);
+                    transform: translateY(20px);
                 }
                 to {
                     opacity: 1;
@@ -272,46 +137,204 @@
                 }
             }
 
-            .welcome-card {
-                animation: fadeInUp 0.5s ease-out;
+            .welcome-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--gray-900);
+                margin-bottom: 8px;
+            }
+
+            .welcome-subtitle {
+                font-size: 16px;
+                color: var(--gray-600);
+                margin-bottom: 20px;
+            }
+
+            .role-badges {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .role-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 16px;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            .role-badge.division-head {
+                background: linear-gradient(135deg, var(--warning-color), #d97706);
+            }
+
+            /* Alert */
+            .alert {
+                padding: 16px 20px;
+                border-radius: 12px;
+                margin-bottom: 24px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 500;
+                font-size: 14px;
+                background: #d1fae5;
+                color: #065f46;
+                border-left: 4px solid var(--success-color);
+                animation: slideDown 0.3s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Section Header */
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid var(--gray-200);
+            }
+
+            .section-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: var(--gray-900);
+            }
+
+            .section-badge {
+                background: linear-gradient(135deg, var(--warning-color), #d97706);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Action Cards */
+            .action-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+                margin-bottom: 32px;
             }
 
             .action-card {
+                background: white;
+                border: 1px solid var(--gray-200);
+                border-radius: 12px;
+                padding: 24px;
+                text-align: center;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                 animation: fadeInUp 0.5s ease-out;
                 animation-fill-mode: both;
             }
 
-            .action-card:nth-child(1) {
-                animation-delay: 0.1s;
+            .action-card:nth-child(1) { animation-delay: 0.1s; }
+            .action-card:nth-child(2) { animation-delay: 0.2s; }
+            .action-card:nth-child(3) { animation-delay: 0.3s; }
+            .action-card:nth-child(4) { animation-delay: 0.4s; }
+            .action-card:nth-child(5) { animation-delay: 0.5s; }
+            .action-card:nth-child(6) { animation-delay: 0.6s; }
+
+            .action-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+                border-color: var(--primary-color);
             }
-            .action-card:nth-child(2) {
-                animation-delay: 0.2s;
+
+            .action-icon {
+                width: 64px;
+                height: 64px;
+                margin: 0 auto 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                font-size: 32px;
             }
-            .action-card:nth-child(3) {
-                animation-delay: 0.3s;
+
+            .action-card-primary .action-icon {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
             }
-            .action-card:nth-child(4) {
-                animation-delay: 0.4s;
+
+            .action-card-success .action-icon {
+                background: linear-gradient(135deg, var(--success-color), #059669);
+                color: white;
             }
-            .action-card:nth-child(5) {
-                animation-delay: 0.5s;
+
+            .action-card-warning .action-icon {
+                background: linear-gradient(135deg, var(--warning-color), #d97706);
+                color: white;
             }
-            .action-card:nth-child(6) {
-                animation-delay: 0.6s;
+
+            .action-card-info .action-icon {
+                background: linear-gradient(135deg, #06b6d4, #0891b2);
+                color: white;
+            }
+
+            .action-card-purple .action-icon {
+                background: linear-gradient(135deg, var(--purple-color), #7c3aed);
+                color: white;
+            }
+
+            .action-card-pink .action-icon {
+                background: linear-gradient(135deg, var(--pink-color), #db2777);
+                color: white;
+            }
+
+            .action-title {
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--gray-900);
+                margin-bottom: 8px;
+            }
+
+            .action-description {
+                font-size: 14px;
+                color: var(--gray-600);
+                line-height: 1.5;
             }
 
             /* Responsive */
             @media (max-width: 768px) {
+                .nav-container {
+                    height: auto;
+                    padding: 16px;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .main-container {
+                    padding: 20px 16px;
+                }
+
                 .welcome-card {
-                    padding: 30px 20px;
+                    padding: 24px 20px;
                 }
 
                 .welcome-title {
-                    font-size: 24px;
-                }
-
-                .welcome-subtitle {
-                    font-size: 16px;
+                    font-size: 22px;
                 }
 
                 .action-cards {
@@ -321,36 +344,45 @@
         </style>
     </head>
     <body>
-        <c:if test="${not empty sessionScope.success}">
-            <div style="
-                 background: #d4edda;
-                 border: 1px solid #c3e6cb;
-                 color: #155724;
-                 padding: 12px 18px;
-                 border-radius: 6px;
-                 margin: 15px 0;
-                 font-size: 15px;
-                 ">
-                ✅ ${sessionScope.success}
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <div class="nav-brand-icon">🏢</div>
+                    <span>Enterprise Leave Management</span>
+                </div>
+                <div class="nav-actions">
+                    <a href="${pageContext.request.contextPath}/login" class="btn-logout">
+                        <span>🚪</span> Đăng xuất
+                    </a>
+                </div>
             </div>
-            <c:remove var="success" scope="session"/>
-        </c:if>
+        </nav>
 
-        <div class="dashboard-container">
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Success Alert -->
+            <c:if test="${not empty sessionScope.success}">
+                <div class="alert">
+                    <span style="font-size: 20px;">✅</span>
+                    <span>${sessionScope.success}</span>
+                </div>
+                <c:remove var="success" scope="session"/>
+            </c:if>
+
             <!-- Welcome Card -->
             <div class="welcome-card">
                 <div class="welcome-title">
-                    <i class="bi bi-emoji-smile"></i> Xin chào, ${sessionScope.auth.displayname}!
+                    👋 Xin chào, ${sessionScope.auth.displayname}!
                 </div>
                 <div class="welcome-subtitle">
                     Chào mừng bạn đến với hệ thống quản lý đơn xin nghỉ
                 </div>
-
                 <div class="role-badges">
                     <c:forEach var="role" items="${sessionScope.auth.roles}">
                         <c:set var="isDivisionHead" value="${role.rname eq 'IT Head' || role.rname eq 'QA Head' || role.rname eq 'Sale Head'}" />
                         <span class="role-badge ${isDivisionHead ? 'division-head' : ''}">
-                            <i class="bi bi-shield-check"></i>
+                            <span>🎯</span>
                             ${role.rname}
                         </span>
                     </c:forEach>
@@ -366,107 +398,72 @@
             </c:forEach>
 
             <!-- Common Features Section -->
-            <div class="section-divider">
-                <h2 class="section-title">
-                    <i class="bi bi-person-circle"></i>
-                    Chức năng chung
-                </h2>
+            <div class="section-header">
+                <span style="font-size: 24px;">👤</span>
+                <h2 class="section-title">Chức năng chung</h2>
             </div>
 
             <!-- Common Action Cards -->
             <div class="action-cards">
-                <!-- Create Leave Request -->
                 <a href="${pageContext.request.contextPath}/request/create" class="action-card action-card-primary">
-                    <div class="action-icon">
-                        <i class="bi bi-plus-circle"></i>
-                    </div>
+                    <div class="action-icon">📝</div>
                     <div class="action-title">Tạo đơn xin nghỉ</div>
                     <div class="action-description">
                         Gửi yêu cầu nghỉ phép mới của bạn
                     </div>
                 </a>
 
-                <!-- View Leave Requests -->
                 <a href="${pageContext.request.contextPath}/request/list" class="action-card action-card-success">
-                    <div class="action-icon">
-                        <i class="bi bi-list-check"></i>
-                    </div>
+                    <div class="action-icon">📋</div>
                     <div class="action-title">Xem danh sách đơn</div>
                     <div class="action-description">
-                        Quản lý và theo dõi các đơn xin nghỉ của bạn
+                        Quản lý và theo dõi các đơn xin nghỉ
                     </div>
                 </a>
             </div>
 
-            <!-- Division Leader Features Section -->
+            <!-- Division Leader Features -->
             <c:if test="${isDivisionLeader}">
-                <div class="section-divider">
-                    <h2 class="section-title">
-                        <i class="bi bi-star-fill"></i>
-                        Chức năng dành cho Trưởng phòng
-                        <span class="badge">LEADER ONLY</span>
-                    </h2>
+                <div class="section-header" style="margin-top: 40px;">
+                    <span style="font-size: 24px;">⭐</span>
+                    <h2 class="section-title">Chức năng dành cho Trưởng phòng</h2>
+                    <span class="section-badge">Leader Only</span>
                 </div>
 
-                <!-- Leader Action Cards -->
                 <div class="action-cards">
-                    <!-- Dashboard -->
                     <a href="${pageContext.request.contextPath}/request/dashboard" class="action-card action-card-warning">
-                        <div class="action-icon">
-                            <i class="bi bi-speedometer2"></i>
-                        </div>
+                        <div class="action-icon">📊</div>
                         <div class="action-title">Dashboard Tổng Quan</div>
                         <div class="action-description">
-                            Xem thống kê và tổng quan về đơn nghỉ phép của phòng ban
+                            Xem thống kê và tổng quan về đơn nghỉ phép
                         </div>
                     </a>
 
-                    <!-- Calendar/Agenda -->
                     <a href="${pageContext.request.contextPath}/request/agenda" class="action-card action-card-info">
-                        <div class="action-icon">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
+                        <div class="action-icon">📅</div>
                         <div class="action-title">Leave Agenda</div>
                         <div class="action-description">
                             Xem lịch nghỉ phép của nhân viên theo tháng
                         </div>
                     </a>
 
-                    <!-- Reports -->
                     <a href="${pageContext.request.contextPath}/request/report" class="action-card action-card-purple">
-                        <div class="action-icon">
-                            <i class="bi bi-file-earmark-bar-graph"></i>
-                        </div>
+                        <div class="action-icon">📈</div>
                         <div class="action-title">Báo Cáo & Thống Kê</div>
                         <div class="action-description">
-                            Tạo và xuất báo cáo chi tiết về nghỉ phép (Excel, CSV)
+                            Tạo và xuất báo cáo chi tiết về nghỉ phép
                         </div>
                     </a>
 
-                    <!-- Team Overview -->
                     <a href="${pageContext.request.contextPath}/request/team" class="action-card action-card-pink">
-                        <div class="action-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <div class="action-title">Oveview Team</div>
+                        <div class="action-icon">👥</div>
+                        <div class="action-title">Overview Team</div>
                         <div class="action-description">
                             Xem chi tiết thông tin nghỉ phép của từng nhân viên
                         </div>
                     </a>
                 </div>
             </c:if>
-
-
-            <!-- Logout Section -->
-            <div class="logout-section">
-                <a href="${pageContext.request.contextPath}/login" class="btn-logout">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Đăng xuất
-                </a>
-            </div>
         </div>
-
-        <!-- Bootstrap 5 JS Bundle -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
-</html> 
+</html>
