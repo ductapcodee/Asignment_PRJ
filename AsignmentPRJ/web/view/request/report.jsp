@@ -654,7 +654,7 @@
                         <span style="font-size: 24px;">📊</span>
                         <h2 class="section-title">Kết quả báo cáo</h2>
                     </div>
-
+                    
                     <!-- Summary Statistics -->
                     <div class="summary-stats">
                         <div class="stat-box">
@@ -795,18 +795,30 @@
                 const tabCustom = document.getElementById('tabCustom');
                 const currentFilter = document.getElementById('currentFilter');
 
+                // ✅ Get select boxes
+                const statusFilterQuick = document.getElementById('statusFilter');
+                const statusFilterCustom = document.getElementById('statusFilterCustom');
+
                 if (selected === 'quick') {
                     quick.style.display = 'block';
                     custom.style.display = 'none';
                     tabQuick.classList.add('active');
                     tabCustom.classList.remove('active');
                     currentFilter.textContent = "📅 Bộ lọc hiện tại: Lọc nhanh (chọn tùy chọn)";
+
+                    // ✅ Enable quick, disable custom
+                    statusFilterQuick.disabled = false;
+                    statusFilterCustom.disabled = true;
                 } else {
                     quick.style.display = 'none';
                     custom.style.display = 'block';
                     tabCustom.classList.add('active');
                     tabQuick.classList.remove('active');
                     currentFilter.textContent = "📅 Bộ lọc hiện tại: Tùy chỉnh (chọn khoảng thời gian)";
+
+                    // ✅ Enable custom, disable quick
+                    statusFilterQuick.disabled = true;
+                    statusFilterCustom.disabled = false;
                 }
             }
 

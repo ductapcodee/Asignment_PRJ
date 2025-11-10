@@ -29,7 +29,7 @@ public class ReportController extends BaseRequiredAuthenticationController {
         String fromDate = req.getParameter("from");
         String toDate = req.getParameter("to");
         String status = req.getParameter("status");
-
+        
         // ✅ Lấy data
         RequestDBContext db = new RequestDBContext();
         ArrayList<RequestForLeave> requests = getRequestsByRole(db, user);
