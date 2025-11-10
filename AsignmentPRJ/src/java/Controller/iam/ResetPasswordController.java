@@ -60,6 +60,6 @@ public class ResetPasswordController extends HttpServlet {
             return;
         }
         db.updatePassword(user.getId(), PasswordUtil.hash(newpass));
-        resp.sendRedirect("login");
+        resp.sendRedirect("login?success=1");
     }
 }

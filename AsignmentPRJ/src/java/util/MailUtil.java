@@ -27,6 +27,7 @@ public class MailUtil {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", "587");
+        props.put("mail.mime.charset", "UTF-8");
 
         Session session = Session.getInstance(props,
             new Authenticator() {
@@ -41,7 +42,7 @@ public class MailUtil {
         msg.setFrom(new InternetAddress(user));
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         msg.setSubject(subject);
-        msg.setText(messageText);
+        msg.setContent(messageText, "text/html; charset=UTF-8");
 
         Transport.send(msg);
     }

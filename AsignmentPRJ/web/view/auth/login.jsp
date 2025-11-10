@@ -285,6 +285,11 @@
     </head>
     <body>
         <div class="login-container">
+            <c:if test="${param.success == '1'}">
+                <div class="alert alert-success">
+                    Đổi mật khẩu thành công! Vui lòng đăng nhập lại.
+                </div>
+            </c:if>
             <div class="login-card">
                 <!-- Header -->
                 <div class="login-header">
