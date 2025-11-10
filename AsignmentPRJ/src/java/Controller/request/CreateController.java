@@ -39,7 +39,17 @@ public class CreateController extends BaseRequiredAuthenticationController {
         try {
             LocalDate fromDate = LocalDate.parse(from);
             LocalDate toDate = LocalDate.parse(to);
+            LocalDate today = LocalDate.now();
 
+            // Nếu ngày bắt đầu nhỏ hơn hôm nay → không cho tạo
+            if (fromDate.isBefore(today)) {
+                req.setAttribute("error", "Không được tạo đơn nghỉ cho ngày đã qua!");
+                req.setAttribute("from", from);
+                req.setAttribute("to", to);
+                req.setAttribute("reason", reason);
+                req.getRequestDispatcher("../view/request/create.jsp").forward(req, resp);
+                return;
+            }
             // Kiểm tra ngày kết thúc phải sau hoặc bằng ngày bắt đầu
             if (toDate.isBefore(fromDate)) {
                 req.setAttribute("error", "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu!");

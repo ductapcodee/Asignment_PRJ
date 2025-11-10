@@ -402,6 +402,16 @@ public class RequestDBContext extends DBContext<RequestForLeave> {
         r.setProcessedTime(rs.getTimestamp("processed_time"));
         return r;
     }
+    
+    public void delete(int id) {
+    String sql = "DELETE FROM RequestForLeave WHERE rid = ?";
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, id);
+        stm.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
     // ✅ CRUD cơ bản
     @Override
